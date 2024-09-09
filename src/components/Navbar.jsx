@@ -9,7 +9,7 @@ export default function Navbar() {
           <li>
             <Link
               to="/login"
-              className="p-2 border-2 border-gray-700 hover:bg-slate-400 active:bg-slate-500  font-bold"
+              className="bg-white  font-bold p-2 border-2 border-gray-700 hover:bg-green-400 active:bg-green-500"
             >
               connexion
             </Link>
