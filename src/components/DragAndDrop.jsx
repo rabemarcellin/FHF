@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { uploadChunkService } from "../services/upload";
+import { LuHardDriveUpload } from "react-icons/lu";
 
 export default function DragAndDrop({
   setChunkUploaded,
@@ -60,10 +61,16 @@ export default function DragAndDrop({
       }}
       className="p-4 cursor-pointer w-full  h-full bg-white rounded-md shadow-lg"
     >
-      <div className=" flex  justify-center items-center h-full border-dashed  border-4">
-        <div>
-          {videoName ? videoName : "Cliquer ici pour televerser un fichier"}
-        </div>
+      <div className="flex justify-center items-center  h-full border-dashed  border-4">
+        <section>
+          <div className="flex justify-center items-center">
+            <LuHardDriveUpload className={videoName ? "animate-bounce" : ""} />
+          </div>
+          <div className="flex justify-center items-center">
+            {videoName ? videoName : "Cliquer ici pour televerser un fichier"}
+          </div>
+        </section>
+
         <input
           ref={inputRef}
           onChange={handleUpload}
