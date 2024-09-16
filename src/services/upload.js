@@ -16,3 +16,16 @@ export const uploadChunkService = async (index, videoChunk) => {
 
   return reader;
 };
+
+export const saveChunksService = async (data) => {
+  console.log("data; ", data);
+  await fetch(`${API_URL}/save`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      temps: data,
+    }),
+  });
+};

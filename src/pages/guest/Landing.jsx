@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
 import DragAndDrop from "../../components/DragAndDrop";
 import UploadProgress from "../../components/UploadProgress";
+import { saveChunksService } from "../../services/upload";
 
 export default function Landing() {
   const [videoSize, setVideoSize] = useState(0);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [chunkUploaded, setChunkUploaded] = useState(0);
+  const [chunkParts, setChunkParts] = useState([]);
 
   useEffect(() => {
     if (chunkUploaded % uploadProgress == 0 || chunkUploaded === videoSize) {
       setUploadProgress(0);
+    }
+
+    if (chunkUploaded === videoSize) {
+      saveChunksService(chunkParts);
     }
   }, [chunkUploaded, uploadProgress, videoSize]);
 
@@ -21,6 +27,7 @@ export default function Landing() {
             setChunkUploaded={setChunkUploaded}
             setUploadProgress={setUploadProgress}
             setVideoSize={setVideoSize}
+            setChunkParts={setChunkParts}
           />
         </div>
       </div>

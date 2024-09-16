@@ -5,6 +5,9 @@ const DB_NAME = process.env.DB_NAME;
 const UPLOAD_BUCKET_NAME = process.env.UPLOAD_BUCKET_NAME;
 const TEMP_CHUNK_KEY = process.env.TEMP_CHUNK_KEY;
 const CHUNK_KEY = process.env.CHUNK_KEY;
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 module.exports = {
   MONGODB_URL,
@@ -12,4 +15,7 @@ module.exports = {
   UPLOAD_BUCKET_NAME,
   TEMP_CHUNK_KEY,
   CHUNK_KEY,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
 };

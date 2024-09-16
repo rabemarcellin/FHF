@@ -6,6 +6,7 @@ export default function DragAndDrop({
   setChunkUploaded,
   setUploadProgress,
   setVideoSize,
+  setChunkParts,
 }) {
   const inputRef = useRef(0);
   const [videoName, setVideoName] = useState(null);
@@ -43,6 +44,10 @@ export default function DragAndDrop({
         } else {
           console.log(chunk);
           const data = JSON.parse(chunk);
+          setChunkParts((lastState) => [
+            ...lastState,
+            { index: data.chunkIndex, signature: data.signature },
+          ]);
           setChunkUploaded((lastState) => lastState + data.totalChunks);
         }
       }
