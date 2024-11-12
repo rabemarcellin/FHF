@@ -2,10 +2,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 const express = require("express");
-const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { GridFSBucket } = require("mongodb");
-const streamifier = require("streamifier");
 const { connectDB, getDatabase } = require("./models/database");
 const {
   UPLOAD_BUCKET_NAME,
@@ -14,6 +12,8 @@ const {
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
 } = require("./helpers/constants");
+const { split_video } = require("./helper");
+const { upload_to_cloudinary } = require("./service");
 
 const app = express();
 
@@ -32,48 +32,16 @@ const getChunksLength = (chunks) => {
 };
 
 app.post("/save", (req, res) => {
-  const db = getDatabase();
-  const bucket = new GridFSBucket(db, { bucketName: UPLOAD_BUCKET_NAME });
+  const temp_ids = req.body.temps;
 
-  const tempIds = req.body.temps;
+  const video_parts = split_video(temp_ids);
 
-  const chunkPart = cloudinary.uploader.upload_stream(
-    {
-      resource_type: "video",
-    },
-    (err, result) => {
-      if (err) {
-        console.error("Cloudinary upload error:", err);
-        return res.status(500).send("Upload failed");
-      }
-
-      console.log("Upload result:", result);
-      res.send("Upload successful");
-    }
-  );
-
-  let chunksReadIterator = 0;
-  const chunksLength = tempIds.length;
-
-  tempIds.forEach((chunk) => {
-    const retrieveChunk = bucket.openDownloadStreamByName(chunk.signature);
-
-    retrieveChunk.on("data", (chunk) => {
-      chunkPart.write(chunk);
-    });
-
-    retrieveChunk.on("end", () => {
-      chunksReadIterator++;
-      if (chunksReadIterator === chunksLength) {
-        // When all chunks are read, end the upload stream
-        chunkPart.end();
-      }
-    });
-
-    retrieveChunk.on("error", (err) => {
-      console.error("Error reading chunk:", err);
-      res.status(500).send("Error reading chunk");
-    });
+  video_parts.forEach((video_part) => {
+    upload_to_cloudinary(video_part)
+      .then((response) => {
+        console.log("r ", response);
+      })
+      .catch((err) => console.log(err));
   });
 });
 

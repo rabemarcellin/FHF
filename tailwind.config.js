@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        text: ["Montserrat", "sans-serif"],
+        text: ["'Open Sans'", "Montserrat", "sans-serif"],
       },
     },
   },
