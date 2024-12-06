@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+rueimport React, { useContext, useEffect, useState } from "react";
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 import { convertToHHMMSS, sliceOneVideo } from "../helpers/utils"; // Assuming you have this helper function
@@ -130,18 +130,18 @@ const VideoPreview = ({
   const uploadTrimVideo = async () => {
     //
 
-    if (videoPreview.size < videoSize * 1024 * 1024) {
+    if (startTime > 0 || endTime < videoPreviewDuration) {
       const videoTrimmed = await sliceOneVideo(
         ffmpeg,
         videoPreview,
         startTime,
         endTime
       );
-      console.log("here slice", videoTrimmed);
+      
       await uploadVideo(videoTrimmed);
-    } else if (videoPreview.size === videoSize * 1024 * 1024) {
+    } else {
       await uploadVideo(videoPreview);
-      console.log("here slice haha");
+      
     }
   };
 
