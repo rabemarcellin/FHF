@@ -10,7 +10,12 @@ const { configCloudinary } = require("./helper");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '*', // specify the allowed origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // allow specific methods if needed
+  allowedHeaders: ['Content-Type', 'Authorization'], // allow necessary headers
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
