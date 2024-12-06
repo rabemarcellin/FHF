@@ -1,4 +1,4 @@
-rueimport React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 import { convertToHHMMSS, sliceOneVideo } from "../helpers/utils"; // Assuming you have this helper function
