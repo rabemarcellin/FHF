@@ -1,21 +1,35 @@
-function split_video(video_temp_ids) {
-  const video_temp_ids_length = video_temp_ids.length;
-  const CHUNK_LIMIT = 9;
+const cloudinary = require("cloudinary").v2;
 
-  const video_to_upload = [];
+const {
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
+} = require("./helpers/constants");
 
-  const iteration = Math.ceil(video_temp_ids_length / CHUNK_LIMIT);
+const configCloudinary = () => {
+  cloudinary.config({
+    cloud_name: CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+  });
+};
 
-  for (let cpt = 0; cpt < iteration; cpt++) {
-    const start =
-      cpt * iteration < video_temp_ids_length
-        ? cpt * iteration
-        : video_temp_ids_length;
-    const part = video_temp_ids.slice(start, start + CHUNK_LIMIT);
-    video_to_upload.push(part);
-  }
+const saveStreamToCloudinary = async (stream) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "video",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+    stream.pipe(uploadStream);
+  });
+};
 
-  return video_to_upload;
-}
-
-module.exports = { split_video };
+module.exports = { saveStreamToCloudinary, configCloudinary };

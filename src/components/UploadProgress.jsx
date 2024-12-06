@@ -1,27 +1,18 @@
 import React from "react";
 
-export default function UploadProgress({
-  chunkUploaded,
-  uploadProgress,
-  videoSize,
-}) {
-  return (
-    !!videoSize && (
-      <div className="my-8">
-        <div className="flex justify-end">
-          {Math.ceil(((chunkUploaded + uploadProgress) * 100) / videoSize)}%
+export default function UploadProgress({ uploadProgress, videoSize }) {
+  if (videoSize && parseInt(videoSize) > 0)
+    return (
+      <div className="my-4">
+        <div className="flex justify-end font-mono">
+          {Math.ceil((uploadProgress * 100) / videoSize)}%
         </div>
-        <div className="bg-gray-500 p-px">
-          <div
-            className="bg-white w-px h-px transition-all duration-500"
-            style={{
-              width: `${Math.ceil(
-                ((chunkUploaded + uploadProgress) * 100) / videoSize
-              )}%`,
-            }}
-          />
-        </div>
+
+        <progress
+          className="progress w-full"
+          value={Math.ceil((uploadProgress * 100) / videoSize)}
+          max={"100"}
+        ></progress>
       </div>
-    )
-  );
+    );
 }

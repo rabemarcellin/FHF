@@ -37,7 +37,6 @@ function handle_stream(cloudinary_instance, video_from_mongodb) {
           console.error("error upload: ", err);
           reject({ error: err });
         } else {
-          console.log("result: ", result);
           resolve({ response: result });
         }
       }
@@ -61,20 +60,23 @@ function combine_videos(bucket, videos_from_mongodb, stream) {
       }
 
       //Explanation: Le signature est un signature token jwt, qui fait reference à un video, contient son nom d'origine une fois décoder
-      const { signature } = videos_from_mongodb[index];
-      const video_from_mongodb = bucket.openDownloadStreamByName(signature);
+      if (videos_from_mongodb[index]);
+      {
+        const { signature } = videos_from_mongodb[index];
+        const video_from_mongodb = bucket.openDownloadStreamByName(signature);
 
-      video_from_mongodb.on("data", (chunk) => {
-        stream.write(chunk);
-      });
+        video_from_mongodb.on("data", (chunk) => {
+          stream.write(chunk);
+        });
 
-      video_from_mongodb.on("end", () => {
-        stream_next(index + 1);
-      });
+        video_from_mongodb.on("end", () => {
+          stream_next(index + 1);
+        });
 
-      video_from_mongodb.on("error", (err) => {
-        reject(err);
-      });
+        video_from_mongodb.on("error", (err) => {
+          reject(err);
+        });
+      }
     };
     const INIT = 0;
     stream_next(INIT);

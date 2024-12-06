@@ -1,90 +1,289 @@
-import React, { useEffect, useRef, useState } from "react";
-import { uploadChunkService } from "../services/upload";
-import { LuHardDriveUpload } from "react-icons/lu";
+import React, { useContext, useRef, useState } from "react";
+
+import {
+  createPartContainerService,
+  endVideoPartService,
+  uploadStreamVideo,
+} from "../services/upload";
+import {
+  getVideoDurationInSeconds,
+  handleStream,
+  sliceVideo,
+} from "../helpers/utils";
+import RecoveryToken from "./RecoveryToken";
+import { recoveryModalId } from "../helpers/jsx-ids";
+import { AppContext } from "../contexts/AppContextProvider";
+import VideoPreview from "./VideoPreview";
 
 export default function DragAndDrop({
-  setChunkUploaded,
   setUploadProgress,
   setVideoSize,
-  setChunkParts,
+  activeUploads,
 }) {
   const inputRef = useRef(0);
   const [videoName, setVideoName] = useState(null);
+  const [videoToken, setVideoToken] = useState(null);
+  const [loadVideo, setLoadVideo] = useState(false);
+  const [uploadExceeded, setUploadExceeded] = useState(false);
+  const [videoPreview, setVideoPreview] = useState(null);
+  const [videoPreviewDuration, setVideoPreviewDuration] = useState(0);
 
-  const handleUpload = async (event) => {
-    setChunkUploaded(0);
-    const video = event.target.files[0];
-    console.log(video);
-    setVideoSize(parseInt(video.size));
-    setVideoName(video.name);
-    const chunkSize = 5 * 1024 * 1024; // chunk by 5Mb
+  const initUploadProgress = () => setUploadProgress(0);
+  const { ffmpeg } = useContext(AppContext);
+  const cleanVideoState = () => {
+    setVideoName(null);
+    setVideoToken(null);
+    setVideoSize(0);
+    initUploadProgress();
+    inputRef.current.value = null;
+  };
+  const reInitUploader = () => {
+    cleanVideoState();
+    inputRef.current.click();
+  };
 
-    const getEnd = (chunkStart) => Math.min(chunkStart + chunkSize, video.size);
+  const handleUploadStream = async (event) => {
+    setLoadVideo(true);
 
-    let chunkIndex = 0;
-    let chunkStart = 0;
+    try {
+      initUploadProgress();
+      console.log(event.target.files);
+      const video = event.target.files[0];
+      console.log(video);
+      if (!video) {
+        cleanVideoState();
+        return;
+      }
+      setVideoPreview(video);
 
-    while (chunkStart < video.size) {
-      const end = getEnd(chunkStart);
-      const videoChunk = video.slice(chunkStart, end);
-      const reader = await uploadChunkService(chunkIndex + 1, videoChunk);
-      const decoder = new TextDecoder();
+      if (activeUploads.length >= 5) {
+        console.log("here o");
+        setUploadExceeded(true);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          break;
-        }
-        const chunk = decoder.decode(value, { stream: true });
-        if (typeof JSON.parse(chunk) === "number") {
-          console.log(chunk);
-          if (chunk.toString().length < video.size.toString().length) {
-            setUploadProgress(JSON.parse(chunk));
+        setTimeout(() => {
+          setUploadExceeded(false);
+        }, 5000);
+
+        return;
+      } else {
+      }
+      const videoDuration = await getVideoDurationInSeconds(video);
+      console.log("vd", videoDuration);
+
+      setVideoPreviewDuration(videoDuration);
+      /*  const chunks = await sliceVideo(ffmpeg, video, 24);
+
+      setLoadVideo(false);
+
+      const partToken = await createPartContainerService(video.size);
+      setVideoSize(parseInt(video.size));
+      setVideoName(video.name);
+      for (let position = 0; position < chunks.length; position++) {
+        const reader = await uploadStreamVideo(
+          partToken,
+          video.name,
+          chunks[position],
+          position + 1,
+          video.size
+        );
+
+        const handleContinue = (chunk) => {
+          if (chunk.toString().length <= video.size.toString().length) {
+            setUploadProgress((state) => state + chunk);
           }
-        } else {
-          console.log(chunk);
-          const data = JSON.parse(chunk);
-          setChunkParts((lastState) => [
-            ...lastState,
-            { index: data.chunkIndex, signature: data.signature },
-          ]);
-          setChunkUploaded((lastState) => lastState + data.totalChunks);
+        };
+        const data = await handleStream(reader, handleContinue);
+        console.log("data: ", data);
+        if (data && data.status === 401) {
+          throw new Error("upload number attempts exceeded");
+        } else if (!data && data.status !== 200) {
+          throw new Error("error creating stream upload");
         }
       }
+      await endVideoPartService(partToken, video.size);
+      setVideoToken(partToken);
+      setUploadProgress(video.size);
+      showToken(); */
+    } catch (error) {
+      if (error.message === "upload number attempts exceeded") {
+        setUploadExceeded(true);
 
-      chunkStart = end;
-      chunkIndex++;
+        setTimeout(() => {
+          setUploadExceeded(false);
+        }, 5000);
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setLoadVideo(false);
     }
   };
 
-  return (
-    <div
-      onClick={() => {
-        if (inputRef.current) {
-          inputRef.current.click();
-        }
-      }}
-      className="p-4 cursor-pointer w-full  h-full bg-white rounded-md shadow-lg"
-    >
-      <div className="flex justify-center items-center  h-full border-dashed  border-4">
-        <section>
-          <div className="flex justify-center items-center">
-            <LuHardDriveUpload className={videoName ? "animate-bounce" : ""} />
-          </div>
-          <div className="flex justify-center items-center">
-            {videoName ? videoName : "Cliquer ici pour televerser un fichier"}
-          </div>
-        </section>
+  const uploadVideo = async (video) => {
+    const chunks = await sliceVideo(ffmpeg, video, 24);
 
-        <input
-          ref={inputRef}
-          onChange={handleUpload}
-          type="file"
-          name="bank"
-          accept="video/*"
-          hidden
-        />
+    setLoadVideo(false);
+
+    const partToken = await createPartContainerService(video.size);
+    setVideoSize(parseInt(video.size));
+    setVideoName(video.name);
+    for (let position = 0; position < chunks.length; position++) {
+      const reader = await uploadStreamVideo(
+        partToken,
+        video.name,
+        chunks[position],
+        position + 1,
+        video.size
+      );
+
+      const handleContinue = (chunk) => {
+        if (chunk.toString().length <= video.size.toString().length) {
+          setUploadProgress((state) => state + chunk);
+        }
+      };
+      const data = await handleStream(reader, handleContinue);
+      console.log("data: ", data);
+      if (data && data.status === 401) {
+        throw new Error("upload number attempts exceeded");
+      } else if (!data && data.status !== 200) {
+        throw new Error("error creating stream upload");
+      }
+    }
+    await endVideoPartService(partToken, video.size);
+    setVideoToken(partToken);
+    setUploadProgress(video.size);
+    showToken();
+  };
+
+  const uploadLocalVideo = () => {
+    if (inputRef.current && !videoToken) {
+      inputRef.current.click();
+    }
+  };
+
+  const showToken = () => {
+    document.getElementById(recoveryModalId).showModal();
+  };
+
+  const updateOnSliderChange = (values, handle) => {
+    console.log(values, handle);
+  };
+
+  return (
+    <>
+      {loadVideo && (
+        <div className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center gap-2 backdrop-blur z-10">
+          <span>Chargement de la video </span>
+          <span className="loading loading-dots loading-xs"></span>
+        </div>
+      )}
+      {uploadExceeded && (
+        <div className="absolute bottom-0 right-0 left-0 w-screen">
+          <div className="flex items-center justify-center">
+            <div
+              role="alert"
+              className="alert alert-warning  hover:border-black w-fit m-4"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                />
+              </svg>
+
+              <div>
+                <h3 className="font-bold">
+                  Le nombre maximum d'upload est atteint (5) !
+                </h3>
+                <div className="text-xs">
+                  Attendre à ce qu'un upload soit terminé et réessayer.
+                </div>
+              </div>
+              <button
+                className="btn btn-sm btn-outline"
+                onClick={() => {
+                  uploadLocalVideo();
+                  setUploadExceeded(false);
+                }}
+              >
+                Réessayer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div
+        onClick={uploadLocalVideo}
+        className="p-4 cursor-pointer w-full bg-white rounded-md shadow-lg"
+      >
+        <div className="flex justify-center items-center  border-dashed p-2  border-4">
+          <section>
+            <div className="flex justify-center items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className={`size-6 ${videoName ? "animate-bounce" : ""}`}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
+                />
+              </svg>
+            </div>
+            <div className="flex justify-center max-w-lg overflow-x-hidden items-center my-2">
+              {videoName ? videoName : "Cliquer ici pour téléverser un fichier"}
+            </div>
+            {videoToken && (
+              <div className="flex items-center justify-center">
+                <button
+                  className="btn font-mono btn-neutral w-full"
+                  onClick={showToken}
+                >
+                  Voir la clé
+                </button>
+              </div>
+            )}
+          </section>
+
+          <input
+            ref={inputRef}
+            onChange={handleUploadStream}
+            type="file"
+            name="bank"
+            accept="video/*"
+            hidden
+          />
+        </div>
       </div>
-    </div>
+
+      <VideoPreview
+        videoPreview={videoPreview}
+        videoPreviewDuration={videoPreviewDuration}
+        updateOnSliderChange={updateOnSliderChange}
+        uploadVideo={uploadVideo}
+      />
+
+      {videoToken && (
+        <div className=" p-2 my-4">
+          <button className="btn w-full" onClick={reInitUploader}>
+            Uploader à nouveau
+          </button>
+        </div>
+      )}
+      <RecoveryToken token={videoToken} />
+    </>
   );
 }

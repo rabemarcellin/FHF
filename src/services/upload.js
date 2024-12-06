@@ -1,12 +1,53 @@
 import { API_URL } from "../helpers/constants";
 
-export const uploadChunkService = async (index, videoChunk) => {
-  const endpoint = `${API_URL}/upload`;
+export const createPartContainerService = async (videoSize) => {
+  try {
+    const request = new Request(`${API_URL}/upload/part`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ videoSize: videoSize }),
+    });
+    const response = await fetch(request);
+    const { partToken } = await response.json();
+    return partToken;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const endVideoPartService = async (partToken, videoSize) => {
+  try {
+    const request = new Request(`${API_URL}/upload/part/finish`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ partToken: partToken, videoSize: videoSize }),
+    });
+    await fetch(request);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const uploadStreamVideo = async (
+  partToken,
+  fileName,
+  videoChunk,
+  position
+) => {
+  const endpoint = `${API_URL}/upload/stream`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/octet-stream",
-      "Chunk-Index": index,
+      "File-Name": fileName,
+      "Part-Token": partToken,
+      Position: position,
     },
     body: videoChunk,
     duplex: "half",
@@ -15,17 +56,4 @@ export const uploadChunkService = async (index, videoChunk) => {
   const reader = response.body.getReader();
 
   return reader;
-};
-
-export const saveChunksService = async (data) => {
-  console.log("data; ", data);
-  await fetch(`${API_URL}/save`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      temps: data,
-    }),
-  });
 };
