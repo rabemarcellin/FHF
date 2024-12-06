@@ -40,6 +40,10 @@ const recoveryTokenMiddleware = (req, res, next) => {
 };
 
 const trackStreamProgress = async (req, res, next) => {
+  let keepConnectionInterval = setInterval(() => {
+     res.write("null\n");
+  }, 3000)
+  
   req.on("data", (chunk) => {
     (async () => {
       try {
@@ -64,6 +68,10 @@ const trackStreamProgress = async (req, res, next) => {
       }
     })();
   });
+
+  req.on("end", () => {
+    clearInterval(keepConnectionInterval);
+  })
 
   next();
 };
