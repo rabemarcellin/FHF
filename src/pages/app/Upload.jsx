@@ -107,7 +107,7 @@ export default function Upload() {
         {/* Section responsive */}
         {isScrollTop && (
           <div
-            className="block lg:hidden fixed bottom-0 left-0 w-full"
+            className="z-20 block lg:hidden fixed bottom-0 left-0 w-full"
             onMouseEnter={() => {
               isInside = true;
             }}
@@ -155,6 +155,7 @@ export default function Upload() {
             </div>
           </div>
         )}
+        <div className="block lg:hidden">
         <Sheet
           rootId="here"
           isOpen={openResponsiveActiveUploads}
@@ -174,6 +175,7 @@ export default function Upload() {
           </Sheet.Container>
           <Sheet.Backdrop />
         </Sheet>
+          </div>
       </div>
     </div>
   );
