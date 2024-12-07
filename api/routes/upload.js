@@ -76,9 +76,8 @@ uploadRouter.post("/part/finish", async (req, res) => {
 
 uploadRouter.post(
   "/stream",
-  streamMiddleware,
-  trackStreamProgress,
   uploadMiddleware,
+  trackStreamProgress,
   async (req, res) => {
     console.log("POST", "/upload/stream", new Date().toUTCString());
 
