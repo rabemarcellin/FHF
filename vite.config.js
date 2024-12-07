@@ -8,9 +8,12 @@ export default defineConfig({
     exclude: ["@ffmpeg/ffmpeg"],
   },
   server: {
-    headers: {
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "require-corp",
+    configureServer: (server) => {
+      server.middlewares.use((req, res, next) => {
+        res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+        res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
+        next();
+      });
     },
   },
   plugins: [react(), crossOriginIsolation()],
