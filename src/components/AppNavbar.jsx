@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function AppNavbar() {
   const isAdmin = false;
   return (
-    <div className="navbar bg-white border-b sticky top-0">
+    <div className="z-20 navbar bg-white border-b sticky top-0">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
