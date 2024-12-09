@@ -19,6 +19,7 @@ const saveStreamToCloudinary = async (stream) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: "video",
+        async: true,
       },
       (error, result) => {
         if (error) {

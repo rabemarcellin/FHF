@@ -82,8 +82,6 @@ uploadRouter.post(
   uploadMiddleware,
   trackStreamProgress,
   async (req, res) => {
-    req.setTimeout(600000); // 10 minutes
-
     console.log("POST", "/upload/stream", new Date().toUTCString());
 
     try {
@@ -93,7 +91,7 @@ uploadRouter.post(
       const cloudinaryVideo = await saveStreamToCloudinary(req);
       const publicId = cloudinaryVideo.public_id;
       const secureUrl = cloudinaryVideo.secure_url;
-
+      console.log(cloudinaryVideo);
       await partCollection.insertOne({
         url: secureUrl,
         publicId: publicId,
