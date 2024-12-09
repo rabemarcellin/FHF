@@ -50,7 +50,7 @@ export default function Landing() {
           <div className="max-w-3xl mx-auto ">
             <div className="mockup-browser bg-white border-base-300 border shadow-md">
               <div className="mockup-browser-toolbar">
-                <div className="input  border-base-300 border">
+                <div className="input input-w-max  border-base-300 border">
                   website demo
                 </div>
               </div>

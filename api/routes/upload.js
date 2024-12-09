@@ -29,6 +29,8 @@ uploadRouter.get("/events", streamMiddleware, async (req, res) => {
 });
 // Gestion partie video
 uploadRouter.post("/part", async (req, res) => {
+  console.log("POST", "/upload/part", new Date().toUTCString());
+
   const activeUploads = await uploadActiveCollection.find({}).toArray();
 
   if (activeUploads.length >= 5) {
@@ -59,14 +61,14 @@ uploadRouter.post("/part", async (req, res) => {
 });
 
 uploadRouter.post("/part/finish", async (req, res) => {
+  console.log("POST", "/upload/part/finish", new Date().toUTCString());
+
   const partToken = req.body.partToken;
   const videoSize = req.body.videoSize;
   await uploadActiveCollection.updateOne(
     { partToken: partToken },
     { $set: { chunkLength: videoSize } }
   );
-
-  console.log("here after update it to the database");
 
   setTimeout(() => {
     uploadActiveCollection.deleteOne({ partToken: partToken });

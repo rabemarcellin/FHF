@@ -77,11 +77,15 @@
 
 @layer base {
   body {
-    @apply font-text bg-slate-100;
+    @apply font-text bg-slate-100 min-h-screen;
   }
 }
 
 @layer components {
+  .input-w-max {
+    width: max-content !important;
+  }
+
   .video-preview {
     position: relative;
     display: inline-block;

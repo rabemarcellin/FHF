@@ -14,12 +14,9 @@ import RecoveryToken from "./RecoveryToken";
 import { recoveryModalId } from "../helpers/jsx-ids";
 import { AppContext } from "../contexts/AppContextProvider";
 import VideoPreview from "./VideoPreview";
+import UploadProgress from "./UploadProgress";
 
-export default function DragAndDrop({
-  setUploadProgress,
-  setVideoSize,
-  activeUploads,
-}) {
+export default function DragAndDrop({ activeUploads }) {
   const inputRef = useRef(0);
   const [videoName, setVideoName] = useState(null);
   const [videoToken, setVideoToken] = useState(null);
@@ -27,6 +24,8 @@ export default function DragAndDrop({
   const [uploadExceeded, setUploadExceeded] = useState(false);
   const [videoPreview, setVideoPreview] = useState(null);
   const [videoPreviewDuration, setVideoPreviewDuration] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [videoSize, setVideoSize] = useState(null);
 
   const initUploadProgress = () => setUploadProgress(0);
   const { ffmpeg } = useContext(AppContext);
@@ -35,6 +34,8 @@ export default function DragAndDrop({
     setVideoToken(null);
     setVideoSize(0);
     initUploadProgress();
+    setVideoPreview(null);
+    setVideoPreviewDuration(0);
     inputRef.current.value = null;
   };
   const reInitUploader = () => {
@@ -47,9 +48,7 @@ export default function DragAndDrop({
 
     try {
       initUploadProgress();
-      console.log(event.target.files);
       const video = event.target.files[0];
-      console.log(video);
       if (!video) {
         cleanVideoState();
         return;
@@ -57,7 +56,6 @@ export default function DragAndDrop({
       setVideoPreview(video);
 
       if (activeUploads.length >= 5) {
-        console.log("here o");
         setUploadExceeded(true);
 
         setTimeout(() => {
@@ -68,42 +66,8 @@ export default function DragAndDrop({
       } else {
       }
       const videoDuration = await getVideoDurationInSeconds(video);
-      console.log("vd", videoDuration);
 
       setVideoPreviewDuration(videoDuration);
-      /*  const chunks = await sliceVideo(ffmpeg, video, 24);
-
-      setLoadVideo(false);
-
-      const partToken = await createPartContainerService(video.size);
-      setVideoSize(parseInt(video.size));
-      setVideoName(video.name);
-      for (let position = 0; position < chunks.length; position++) {
-        const reader = await uploadStreamVideo(
-          partToken,
-          video.name,
-          chunks[position],
-          position + 1,
-          video.size
-        );
-
-        const handleContinue = (chunk) => {
-          if (chunk.toString().length <= video.size.toString().length) {
-            setUploadProgress((state) => state + chunk);
-          }
-        };
-        const data = await handleStream(reader, handleContinue);
-        console.log("data: ", data);
-        if (data && data.status === 401) {
-          throw new Error("upload number attempts exceeded");
-        } else if (!data && data.status !== 200) {
-          throw new Error("error creating stream upload");
-        }
-      }
-      await endVideoPartService(partToken, video.size);
-      setVideoToken(partToken);
-      setUploadProgress(video.size);
-      showToken(); */
     } catch (error) {
       if (error.message === "upload number attempts exceeded") {
         setUploadExceeded(true);
@@ -142,7 +106,6 @@ export default function DragAndDrop({
         }
       };
       const data = await handleStream(reader, handleContinue);
-      console.log("data: ", data);
       if (data && data.status === 401) {
         throw new Error("upload number attempts exceeded");
       } else if (!data && data.status !== 200) {
@@ -163,10 +126,6 @@ export default function DragAndDrop({
 
   const showToken = () => {
     document.getElementById(recoveryModalId).showModal();
-  };
-
-  const updateOnSliderChange = (values, handle) => {
-    console.log(values, handle);
   };
 
   return (
@@ -269,12 +228,15 @@ export default function DragAndDrop({
         </div>
       </div>
 
-      <VideoPreview
-        videoPreview={videoPreview}
-        videoPreviewDuration={videoPreviewDuration}
-        updateOnSliderChange={updateOnSliderChange}
-        uploadVideo={uploadVideo}
-      />
+      <UploadProgress uploadProgress={uploadProgress} videoSize={videoSize} />
+
+      {videoPreview && (
+        <VideoPreview
+          videoPreview={videoPreview}
+          videoPreviewDuration={videoPreviewDuration}
+          uploadVideo={uploadVideo}
+        />
+      )}
 
       {videoToken && (
         <div className=" p-2 my-4">

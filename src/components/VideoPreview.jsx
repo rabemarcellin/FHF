@@ -137,51 +137,21 @@ const VideoPreview = ({
         startTime,
         endTime
       );
-      
+
       await uploadVideo(videoTrimmed);
     } else {
       await uploadVideo(videoPreview);
-      
     }
   };
 
   return (
     videoPreviewSrc && (
       <div className="my-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <div className="my-4 text-sm">Taille: {chunkSize} Mb </div>
-          <div>
-            {chunkSize < 100 ? (
-              <div>
-                <button className="btn btn-primary" onClick={uploadTrimVideo}>
-                  Uploader
-                </button>
-              </div>
-            ) : (
-              <div className="text-sm items-center text-red-800 flex gap-2">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                    />
-                  </svg>
-                </div>
-                <div>100Mb maximum</div>
-              </div>
-            )}
-          </div>
         </div>
         <div
-          className="flex justify-center items-center video-preview overflow-hidden rounded-2xl"
+          className="flex w-96 h-[35rem] bg-transparent/50 mx-auto justify-center items-center video-preview overflow-hidden rounded-2xl"
           style={{
             "--start-time-percent": `${
               100 - (startTime / videoPreviewDuration) * 100
@@ -194,10 +164,10 @@ const VideoPreview = ({
           </video>
         </div>
 
-        <div className="flex items-center justify-center my-4">
+        <div className="flex items-center gap-8 my-4">
           <button onClick={togglePlayPause} className="play-pause-button">
             {isPlaying ? (
-              <div className="tooltip tooltip-right" data-tip="Pause">
+              <div className="tooltip tooltip-top z-10" data-tip="Pause">
                 <svg
                   /* pause */
                   xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +185,7 @@ const VideoPreview = ({
                 </svg>
               </div>
             ) : (
-              <div className="tooltip tooltip-right" data-tip="Play">
+              <div className="tooltip tooltip-top z-10" data-tip="Play">
                 <svg
                   /* play */
                   xmlns="http://www.w3.org/2000/svg"
@@ -239,18 +209,50 @@ const VideoPreview = ({
               </div>
             )}
           </button>
+
+          {videoPreviewDuration && (
+            <Nouislider
+              className="flex-1"
+              behaviour="tap-drag"
+              step={1}
+              margin={3}
+              range={{ min: 0, max: videoPreviewDuration }}
+              start={[0, videoPreviewDuration]}
+              connect
+              onUpdate={handleSliderChange}
+            />
+          )}
         </div>
-        {videoPreviewDuration && (
-          <Nouislider
-            behaviour="tap-drag"
-            step={1}
-            margin={3}
-            range={{ min: 0, max: videoPreviewDuration }}
-            start={[0, videoPreviewDuration]}
-            connect
-            onUpdate={handleSliderChange}
-          />
-        )}
+        <div>
+          <button
+            className="btn btn-primary w-full"
+            onClick={uploadTrimVideo}
+            disabled={chunkSize > 100}
+          >
+            Uploader
+          </button>
+          {chunkSize > 100 && (
+            <div className="text-sm items-center text-red-800 flex gap-2">
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                  />
+                </svg>
+              </div>
+              <div>100Mb maximum</div>
+            </div>
+          )}
+        </div>
 
         <div className="my-4 text-sm">
           <div className="flex justify-between">

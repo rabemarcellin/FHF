@@ -12,8 +12,6 @@ let lastScrollTop = 0;
 let isInside = false;
 
 export default function Upload() {
-  const [videoSize, setVideoSize] = useState(0);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [activeUploads, setActiveUploads] = useState([]);
   const [openResponsiveActiveUploads, setOpenResponsiveActiveUploads] =
     useState(false);
@@ -52,7 +50,7 @@ export default function Upload() {
   const handleMouseLeave = async () => {
     isInside = false;
 
-    await sleep(2000);
+    await sleep(1000);
     if (!isInside) setIsScrollTop(false);
   };
 
@@ -71,7 +69,7 @@ export default function Upload() {
   useEffect(() => {
     if (isScrollTop) {
       const verifyMenu = async () => {
-        await sleep(5000);
+        await sleep(1000);
         setTimeout(() => {
           if (!isInside) {
             setIsScrollTop(false);
@@ -87,15 +85,7 @@ export default function Upload() {
       <AppNavbar />
       <div className="w-full flex gap-4 justify-center px-8">
         <div className="w-full max-w-2xl pt-4">
-          <DragAndDrop
-            setUploadProgress={setUploadProgress}
-            setVideoSize={setVideoSize}
-            activeUploads={activeUploads}
-          />
-          <UploadProgress
-            uploadProgress={uploadProgress}
-            videoSize={videoSize}
-          />
+          <DragAndDrop activeUploads={activeUploads} />
         </div>
         <div className="hidden lg:block w-full max-w-96 border m-4 h-fit bg-white shadow rounded-xl p-4">
           <ActiveUploads
@@ -156,26 +146,26 @@ export default function Upload() {
           </div>
         )}
         <div className="block lg:hidden">
-        <Sheet
-          rootId="here"
-          isOpen={openResponsiveActiveUploads}
-          onClose={() => {
-            setOpenResponsiveActiveUploads(false);
-            setIsScrollTop(false);
-          }}
-        >
-          <Sheet.Container>
-            <Sheet.Header />
-            <Sheet.Content>
-              <ActiveUploads
-                activeUploads={activeUploads}
-                setActiveUploads={setActiveUploads}
-              />
-            </Sheet.Content>
-          </Sheet.Container>
-          <Sheet.Backdrop />
-        </Sheet>
-          </div>
+          <Sheet
+            rootId="here"
+            isOpen={openResponsiveActiveUploads}
+            onClose={() => {
+              setOpenResponsiveActiveUploads(false);
+              setIsScrollTop(false);
+            }}
+          >
+            <Sheet.Container>
+              <Sheet.Header />
+              <Sheet.Content>
+                <ActiveUploads
+                  activeUploads={activeUploads}
+                  setActiveUploads={setActiveUploads}
+                />
+              </Sheet.Content>
+            </Sheet.Container>
+            <Sheet.Backdrop />
+          </Sheet>
+        </div>
       </div>
     </div>
   );

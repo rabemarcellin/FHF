@@ -14,7 +14,6 @@ export const getVideoDurationInSeconds = (video) => {
         // Attendre que les métadonnées soient chargées
         videoElement.addEventListener("loadedmetadata", () => {
           const videoDuration = videoElement.duration; // Durée en secondes
-          console.log(videoDuration, "v");
           resolve(videoDuration);
         });
       }
@@ -141,7 +140,6 @@ export const sliceVideo = async (ffmpeg, video, chunkSizeLength = 5) => {
 
   const chunkSize = chunkSizeLength * 1024 * 1024; // 5MB in bytes
   const videoDuration = await getVideoDurationInSeconds(video);
-  console.log("videoDuration", videoDuration);
   const chunks = [];
   const videoSize = video.size;
 
