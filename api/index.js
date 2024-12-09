@@ -1,6 +1,5 @@
 const cors = require("cors");
 const express = require("express");
-const timeout = require("connect-timeout");
 const { connectDB } = require("./models/database");
 const { PORT } = require("./helpers/constants");
 
@@ -17,8 +16,6 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"], // allow specific methods if needed
   })
 );
-
-app.use(timeout("5m"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
