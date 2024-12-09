@@ -5,14 +5,17 @@ import crossOriginIsolation from "vite-plugin-cross-origin-isolation";
 // https://vitejs.dev/config/
 export default defineConfig({
   optimizeDeps: {
-    exclude: ["@ffmpeg/ffmpeg"],
+    exclude: [
+      "@ffmpeg/ffmpeg",
+      "@ffmpeg/util",
+      "@ffmpeg/core",
+      "@ffmpeg/core-mt",
+    ],
   },
   server: {
     headers: {
+      "Cross-Origin-Embedder-Policy": "require-corp",
       "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "credentialless",
-      /*       "Cross-Origin-Resource-Policy": "cross-origin"
-       */
     },
   },
   plugins: [
