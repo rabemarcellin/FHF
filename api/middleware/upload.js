@@ -8,6 +8,7 @@ const streamMiddleware = (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
   next();
 };
 const uploadMiddleware = async (req, res, next) => {
@@ -41,9 +42,10 @@ const recoveryTokenMiddleware = (req, res, next) => {
 
 const trackStreamProgress = async (req, res, next) => {
   let keepConnectionInterval = setInterval(() => {
-     res.write("null\n");
-  }, 3000)
-  
+    console.log("here again");
+    res.write("null\n");
+  }, 3000);
+
   req.on("data", (chunk) => {
     (async () => {
       try {
@@ -71,7 +73,7 @@ const trackStreamProgress = async (req, res, next) => {
 
   req.on("end", () => {
     clearInterval(keepConnectionInterval);
-  })
+  });
 
   next();
 };
