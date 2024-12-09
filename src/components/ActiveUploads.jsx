@@ -58,7 +58,7 @@ const ActiveUploads = ({ activeUploads, setActiveUploads }) => {
   };
 
   useEffect(() => {
-    connectToServer();
+    // connectToServer();
   }, []);
   return isOpen ? (
     <>

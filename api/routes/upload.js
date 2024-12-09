@@ -25,7 +25,7 @@ uploadRouter.get("/events", streamMiddleware, async (req, res) => {
     getActiveUploads().then((activeUploads) => {
       res.write(`data: ${JSON.stringify(activeUploads)}\n\n`);
     });
-  }, 1000);
+  }, 2000);
 });
 // Gestion partie video
 uploadRouter.post("/part", async (req, res) => {
