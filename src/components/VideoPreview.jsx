@@ -4,12 +4,7 @@ import "nouislider/distribute/nouislider.css";
 import { convertToHHMMSS, sliceOneVideo } from "../helpers/utils"; // Assuming you have this helper function
 import { AppContext } from "../contexts/AppContextProvider";
 
-const VideoPreview = ({
-  videoPreview,
-  videoPreviewDuration,
-  updateOnSliderChange,
-  uploadVideo,
-}) => {
+const VideoPreview = ({ videoPreview, videoPreviewDuration, uploadVideo }) => {
   const videoPreviewRef = React.useRef(null);
   const [startTime, setStartTime] = React.useState(0);
   const [endTime, setEndTime] = React.useState(0);
@@ -18,6 +13,7 @@ const VideoPreview = ({
   const [videoSize, setVideoSize] = useState(0); // Total video size in MB
   const [chunkSize, setChunkSize] = useState(0);
   const { ffmpeg } = useContext(AppContext);
+  const [isUploadProcessing, setIsUploadProcessing] = useState(false);
 
   // Update endTime when videoPreviewDuration changes
   useEffect(() => {
@@ -129,18 +125,24 @@ const VideoPreview = ({
 
   const uploadTrimVideo = async () => {
     //
+    try {
+      setIsUploadProcessing(true);
+      if (startTime > 0 || endTime < videoPreviewDuration) {
+        const videoTrimmed = await sliceOneVideo(
+          ffmpeg,
+          videoPreview,
+          startTime,
+          endTime
+        );
 
-    if (startTime > 0 || endTime < videoPreviewDuration) {
-      const videoTrimmed = await sliceOneVideo(
-        ffmpeg,
-        videoPreview,
-        startTime,
-        endTime
-      );
-
-      await uploadVideo(videoTrimmed);
-    } else {
-      await uploadVideo(videoPreview);
+        await uploadVideo(videoTrimmed);
+      } else {
+        await uploadVideo(videoPreview);
+      }
+    } catch (error) {
+      console.error("error trime upload", error);
+    } finally {
+      setIsUploadProcessing(false);
     }
   };
 
@@ -151,7 +153,7 @@ const VideoPreview = ({
           <div className="my-4 text-sm">Taille: {chunkSize} Mb </div>
         </div>
         <div
-          className="flex w-96 h-[35rem] bg-transparent/50 mx-auto justify-center items-center video-preview overflow-hidden rounded-2xl"
+          className="flex w-full max-w-96 h-[35rem] bg-transparent/50 mx-auto justify-center items-center video-preview overflow-hidden rounded-2xl"
           style={{
             "--start-time-percent": `${
               100 - (startTime / videoPreviewDuration) * 100
@@ -226,11 +228,18 @@ const VideoPreview = ({
         <div>
           <button
             className="btn btn-primary w-full"
-            onClick={uploadTrimVideo}
+            onClick={() => {
+              if (!isUploadProcessing) uploadTrimVideo();
+            }}
             disabled={chunkSize > 100}
           >
-            Uploader
+            {isUploadProcessing ? (
+              <span className="loader" />
+            ) : (
+              <span>Uploader</span>
+            )}
           </button>
+
           {chunkSize > 100 && (
             <div className="text-sm items-center text-red-800 flex gap-2">
               <div>

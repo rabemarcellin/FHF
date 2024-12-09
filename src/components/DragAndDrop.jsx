@@ -185,7 +185,7 @@ export default function DragAndDrop({ activeUploads }) {
         className="p-4 cursor-pointer w-full bg-white rounded-md shadow-lg"
       >
         <div className="flex justify-center items-center  border-dashed p-2  border-4">
-          <section>
+          <section className="w-full">
             <div className="flex justify-center items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
