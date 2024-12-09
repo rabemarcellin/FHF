@@ -1,5 +1,6 @@
 const cors = require("cors");
 const express = require("express");
+const timeout = require("connect-timeout");
 const { connectDB } = require("./models/database");
 const { PORT } = require("./helpers/constants");
 
@@ -10,12 +11,14 @@ const { configCloudinary } = require("./helper");
 
 const app = express();
 
-app.use(cors({
-  origin: '*', // specify the allowed origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // allow specific methods if needed
-}));
+app.use(
+  cors({
+    origin: "*", // specify the allowed origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // allow specific methods if needed
+  })
+);
 
-app.options("*", cors())
+app.use(timeout("5m"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
