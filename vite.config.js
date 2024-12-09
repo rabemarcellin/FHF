@@ -5,12 +5,7 @@ import crossOriginIsolation from "vite-plugin-cross-origin-isolation";
 // https://vitejs.dev/config/
 export default defineConfig({
   optimizeDeps: {
-    exclude: [
-      "@ffmpeg/ffmpeg",
-      "@ffmpeg/util",
-      "@ffmpeg/core",
-      "@ffmpeg/core-mt",
-    ],
+    exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util", "@ffmpeg/core-mt"],
   },
   server: {
     headers: {
