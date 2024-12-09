@@ -11,7 +11,8 @@ export default defineConfig({
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "credentialless",
-      "Cross-Origin-Resource-Policy": "cross-origin"
+      /*       "Cross-Origin-Resource-Policy": "cross-origin"
+       */
     },
   },
   plugins: [react(), crossOriginIsolation()],
