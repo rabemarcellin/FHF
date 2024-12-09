@@ -82,6 +82,8 @@ uploadRouter.post(
   uploadMiddleware,
   trackStreamProgress,
   async (req, res) => {
+    req.setTimeout(600000); // 10 minutes
+
     console.log("POST", "/upload/stream", new Date().toUTCString());
 
     try {
