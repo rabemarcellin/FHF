@@ -1,5 +1,7 @@
 const cors = require("cors");
 const express = require("express");
+const timeout = require("connect-timeout");
+
 const { connectDB } = require("./models/database");
 const { PORT } = require("./helpers/constants");
 
@@ -9,6 +11,7 @@ const videoRouter = require("./routes/video");
 const { configCloudinary } = require("./helper");
 
 const app = express();
+app.use(timeout("600s"));
 
 app.use(
   cors({

@@ -1,6 +1,8 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 const { TEMP_CHUNK_KEY } = require("../helpers/constants");
 const {
   uploadMiddleware,
@@ -108,5 +110,34 @@ uploadRouter.post(
     }
   }
 );
+
+// non-stream upload
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "videos", // Dossier dans Cloudinary
+    resource_type: "video", // Type de ressource
+  },
+});
+
+const upload = multer({ storage });
+uploadRouter.post("/video", upload.single("video"), async (req, res) => {
+  console.log("POST", "/upload/video", new Date().toUTCString());
+  try {
+    const { path } = req.file;
+    const { partToken, position, fileName } = req.body;
+    await partCollection.insertOne({
+      url: path,
+      partToken: partToken,
+      position: position,
+      fileName: fileName,
+    });
+    res.sendStatus(201);
+  } catch (error) {
+    console.log("[ERROR]", "POST", "/upload/video", new Date().toUTCString());
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
 
 module.exports = uploadRouter;

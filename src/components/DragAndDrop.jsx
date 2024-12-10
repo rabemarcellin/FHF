@@ -4,6 +4,7 @@ import {
   createPartContainerService,
   endVideoPartService,
   uploadStreamVideo,
+  uploadVideoService,
 } from "../services/upload";
 import {
   getVideoDurationInSeconds,
@@ -92,25 +93,15 @@ export default function DragAndDrop({ activeUploads }) {
     setVideoSize(parseInt(video.size));
     setVideoName(video.name);
     for (let position = 0; position < chunks.length; position++) {
-      const reader = await uploadStreamVideo(
+      console.log(chunks[position], video.size);
+      const uploadStatus = await uploadVideoService(
+        chunks[position],
         partToken,
         video.name,
-        chunks[position],
-        position + 1,
-        video.size
+        position
       );
 
-      const handleContinue = (chunk) => {
-        if (chunk.toString().length <= video.size.toString().length) {
-          setUploadProgress((state) => state + chunk);
-        }
-      };
-      const data = await handleStream(reader, handleContinue);
-      if (data && data.status === 401) {
-        throw new Error("upload number attempts exceeded");
-      } else if (!data && data.status !== 200) {
-        throw new Error("error creating stream upload");
-      }
+      console.log("u_status: ", uploadStatus);
     }
     await endVideoPartService(partToken, video.size);
     setVideoToken(partToken);

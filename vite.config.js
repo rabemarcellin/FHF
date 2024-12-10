@@ -7,7 +7,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
   },
-
   plugins: [
     react(),
     /* crossOriginIsolation(), */

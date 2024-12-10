@@ -57,3 +57,26 @@ export const uploadStreamVideo = async (
 
   return reader;
 };
+
+export const uploadVideoService = async (
+  videoChunk,
+  partToken,
+  fileName,
+  position
+) => {
+  const endpoint = `${API_URL}/upload/video`;
+  const formData = new FormData();
+  formData.append("video", videoChunk);
+  formData.append("fileName", fileName);
+  formData.append("partToken", partToken);
+  formData.append("position", position);
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    body: formData,
+  });
+  console.log("response: ", response);
+  //const data = await response.json();
+
+  return response;
+};
