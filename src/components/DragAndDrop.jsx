@@ -1,4 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import {
   createPartContainerService,
@@ -28,6 +29,9 @@ export default function DragAndDrop({ activeUploads }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [videoSize, setVideoSize] = useState(null);
 
+  // full-screen handler
+  const handleFullScreen = useFullScreenHandle();
+
   const initUploadProgress = () => setUploadProgress(0);
   const { ffmpeg } = useContext(AppContext);
   const cleanVideoState = () => {
@@ -44,10 +48,19 @@ export default function DragAndDrop({ activeUploads }) {
     inputRef.current.click();
   };
 
-  const handleUploadStream = async (event) => {
-    setLoadVideo(true);
-
+  const importVideoFromLocal = async (event) => {
     try {
+      const video = event.target.files[0];
+      // Roadmap: verify imported is video and only one
+
+      if (video) {
+        setVideoPreview(video);
+        await handleFullScreen.enter();
+      }
+    } catch (error) {}
+    await handleFullScreen.enter();
+
+    /*  try {
       initUploadProgress();
       const video = event.target.files[0];
       if (!video) {
@@ -81,7 +94,7 @@ export default function DragAndDrop({ activeUploads }) {
       }
     } finally {
       setLoadVideo(false);
-    }
+    } */
   };
 
   const uploadVideo = async (video) => {
@@ -117,6 +130,11 @@ export default function DragAndDrop({ activeUploads }) {
 
   const showToken = () => {
     document.getElementById(recoveryModalId).showModal();
+  };
+
+  const exitFullScreen = async () => {
+    await handleFullScreen.exit();
+    cleanVideoState();
   };
 
   return (
@@ -210,7 +228,7 @@ export default function DragAndDrop({ activeUploads }) {
 
           <input
             ref={inputRef}
-            onChange={handleUploadStream}
+            onChange={importVideoFromLocal}
             type="file"
             name="bank"
             accept="video/*"
@@ -222,11 +240,14 @@ export default function DragAndDrop({ activeUploads }) {
       <UploadProgress uploadProgress={uploadProgress} videoSize={videoSize} />
 
       {videoPreview && (
-        <VideoPreview
-          videoPreview={videoPreview}
-          videoPreviewDuration={videoPreviewDuration}
-          uploadVideo={uploadVideo}
-        />
+        <FullScreen handle={handleFullScreen}>
+          <VideoPreview
+            videoPreview={videoPreview}
+            videoPreviewDuration={videoPreviewDuration}
+            uploadVideo={uploadVideo}
+            exitFullScreen={exitFullScreen}
+          />
+        </FullScreen>
       )}
 
       {videoToken && (

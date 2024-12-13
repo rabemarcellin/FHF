@@ -4,13 +4,23 @@ import { Link } from "react-router-dom";
 export default function AppNavbar() {
   const isAdmin = false;
   return (
-    <div className="z-20 navbar bg-white border-b sticky top-0">
-      <div className="navbar-start">
+    <div className="z-20 navbar bg-white border-b sticky top-0 min-h-0 h-[50px] lg:h-[60px]">
+      <div className="navbar-start" />
+      <div className="navbar-center">
+        <Link to="/" className="btn btn-ghost text-xl font-black">
+          FHF
+        </Link>
+      </div>
+      <div className="navbar-end">
         <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost btn-circle min-h-0 h-8 w-8 lg:h-10 lg:w-10"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              className="h-4 w-4 lg:h-5 lg:w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -34,13 +44,6 @@ export default function AppNavbar() {
             </li>
           </ul>
         </div>
-      </div>
-      <div className="navbar-center">
-        <Link to="/" className="btn btn-ghost text-xl font-mono">
-          UploadVideo
-        </Link>
-      </div>
-      <div className="navbar-end">
         {isAdmin && (
           <button className="btn btn-ghost btn-circle">
             <div className="indicator">

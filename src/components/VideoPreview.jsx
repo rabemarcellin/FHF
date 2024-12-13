@@ -3,8 +3,14 @@ import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 import { convertToHHMMSS, sliceOneVideo } from "../helpers/utils"; // Assuming you have this helper function
 import { AppContext } from "../contexts/AppContextProvider";
+import Timeline from "./Timeline";
 
-const VideoPreview = ({ videoPreview, videoPreviewDuration, uploadVideo }) => {
+const VideoPreview = ({
+  videoPreview,
+  videoPreviewDuration,
+  uploadVideo,
+  exitFullScreen,
+}) => {
   const videoPreviewRef = React.useRef(null);
   const [startTime, setStartTime] = React.useState(0);
   const [endTime, setEndTime] = React.useState(0);
@@ -14,6 +20,7 @@ const VideoPreview = ({ videoPreview, videoPreviewDuration, uploadVideo }) => {
   const [chunkSize, setChunkSize] = useState(0);
   const { ffmpeg } = useContext(AppContext);
   const [isUploadProcessing, setIsUploadProcessing] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   // Update endTime when videoPreviewDuration changes
   useEffect(() => {
@@ -148,30 +155,110 @@ const VideoPreview = ({ videoPreview, videoPreviewDuration, uploadVideo }) => {
 
   return (
     videoPreviewSrc && (
-      <div className="my-4">
-        <div className="flex items-center justify-center">
-          <div className="my-4 text-sm">Taille: {chunkSize} Mb </div>
-        </div>
-        <div
-          className="flex w-full max-w-96 h-[35rem] bg-transparent/50 mx-auto justify-center items-center video-preview overflow-hidden rounded-2xl"
-          style={{
-            "--start-time-percent": `${
-              100 - (startTime / videoPreviewDuration) * 100
-            }%`,
-            "--end-time-percent": `${(endTime / videoPreviewDuration) * 100}%`,
-          }}
-        >
-          <video width="100%" ref={videoPreviewRef}>
-            <source src={videoPreviewSrc} />
-          </video>
-        </div>
+      <div className="h-full bg-white flex items-center justify-center p-2">
+        <div className="h-[85vh] min-w-96 w-96 rounded-2xl overflow-y-hidden overflow-x-auto">
+          <div
+            className="relative flex w-full h-full bg-black mx-auto justify-center items-center video-preview overflow-hidden"
+            style={{
+              "--start-time-percent": `${
+                100 - (startTime / videoPreviewDuration) * 100
+              }%`,
+              "--end-time-percent": `${
+                (endTime / videoPreviewDuration) * 100
+              }%`,
+            }}
+          >
+            <div className="action action--top">
+              <div className="flex justify-end m-4">
+                <button
+                  onClick={exitFullScreen}
+                  className="f-btn"
+                  data-tip="Quitter le plein écran"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="bg"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="white"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            {/*  <div className="flex items-center justify-center absolute">
+              <div className="my-4 text-sm">Taille: {chunkSize} Mb </div>
+            </div> */}
+            <video width="100%" ref={videoPreviewRef}>
+              <source src={videoPreviewSrc} />
+            </video>
 
-        <div className="flex items-center gap-8 my-4">
+            <div className="action action--bottom">
+              <div
+                className={`transition duration-300 ease-in-out  ${
+                  showTimeline ? "opacity-1" : "hidden opacity-0"
+                }`}
+              >
+                <Timeline video={videoPreview} />
+              </div>
+              <div className="flex justify-end gap-2 m-4">
+                <button
+                  className="f-btn"
+                  data-tip="Timeline"
+                  onClick={() => setShowTimeline(!showTimeline)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="white"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={exitFullScreen}
+                  className="f-btn"
+                  data-tip="Uploader"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="white"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/*  <div className="flex items-center gap-8 my-4">
           <button onClick={togglePlayPause} className="play-pause-button">
             {isPlaying ? (
               <div className="tooltip tooltip-top z-10" data-tip="Pause">
                 <svg
-                  /* pause */
+                  /* pause 
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -189,7 +276,7 @@ const VideoPreview = ({ videoPreview, videoPreviewDuration, uploadVideo }) => {
             ) : (
               <div className="tooltip tooltip-top z-10" data-tip="Play">
                 <svg
-                  /* play */
+                  /* play 
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -278,6 +365,7 @@ const VideoPreview = ({ videoPreview, videoPreviewDuration, uploadVideo }) => {
               </div>
             </div>
           </div>
+        </div> */}
         </div>
       </div>
     )

@@ -76,8 +76,11 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply bg-slate-100 w-screen overflow-x-hidden;
+  }
   body {
-    @apply font-text bg-slate-100 min-h-screen;
+    @apply font-text text-sm lg:text-base overflow-x-hidden;
   }
 }
 
@@ -158,5 +161,25 @@
     80% {
       transform: scale(1.2);
     }
+  }
+
+  /* Video preview */
+  .action {
+    @apply absolute left-0 w-full z-10 text-xs;
+  }
+
+  .action.action--top {
+    @apply top-0;
+  }
+
+  .action.action--bottom {
+    @apply bottom-0;
+  }
+
+  .action .f-btn {
+    @apply tooltip tooltip-left w-8 h-8 rounded-full bg-white/15 flex items-center justify-center cursor-pointer;
+    @apply transition duration-300 ease-in-out;
+    @apply hover:bg-white/20;
+    @apply before:text-xs;
   }
 }
