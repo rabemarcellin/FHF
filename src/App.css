@@ -182,4 +182,18 @@
     @apply hover:bg-white/20;
     @apply before:text-xs;
   }
+
+  .slider {
+    @apply h-full bg-black/50 rounded border-2 border-white/50 relative;
+  }
+
+  .slider::before {
+    @apply content-[''] absolute h-full top-0 left-0 bg-white/15;
+    width: var(--start-time-position);
+  }
+
+  .slider::after {
+    @apply content-[''] absolute h-full top-0 right-0 bg-white/15;
+    width: var(--end-time-position);
+  }
 }
