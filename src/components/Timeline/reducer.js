@@ -1,4 +1,8 @@
-import actionsType from "./actions";
+import actionsType, {
+  max_zoom_scale,
+  min_zoom_scale,
+  zoom_scale,
+} from "./actions";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -28,6 +32,22 @@ const reducer = (state, action) => {
 
     case actionsType.SET_VIDEO_SIZE:
       return { ...state, cutVideoSize: action.cutVideoSize };
+
+    case actionsType.ZOOM_IN:
+      return { ...state, scale: state.scale + zoom_scale };
+
+    case actionsType.ZOOM_OUT: {
+      if (state.scale > min_zoom_scale) {
+        return { ...state, scale: state.scale - zoom_scale };
+      }
+    }
+
+    case actionsType.UPDATE_DRAG_ACCORDING_ZOOM:
+      return {
+        ...state,
+        cutStartPosition: action.newStartPosition,
+        cutEndPosition: action.newEndPosition,
+      };
     default:
       return state;
   }

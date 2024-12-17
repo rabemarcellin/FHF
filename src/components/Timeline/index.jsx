@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useRef } from "react";
 import { useAsyncMemo } from "use-async-memo";
 import {
   convertToHHMMSS,
@@ -6,7 +6,11 @@ import {
 } from "../../helpers/utils";
 import { getVideoPosition, moveSidebarLeft, moveSidebarRight } from "./utils";
 import reducer from "./reducer";
-import actionsType from "./actions";
+import actionsType, {
+  max_zoom_scale,
+  min_zoom_scale,
+  zoom_scale,
+} from "./actions";
 
 const initialState = {
   isPlaying: false,
@@ -15,7 +19,11 @@ const initialState = {
   cutStartPosition: 0,
   cutEndPosition: 0,
   cutVideoSize: 0,
+  scale: 1,
 };
+
+let zoomSliderWidth = 0;
+let prevScale = 1;
 
 const Timeline = ({ video }) => {
   // timeline state
@@ -23,8 +31,6 @@ const Timeline = ({ video }) => {
   const sliderLeftRef = useRef(null);
   const sliderRightRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  console.log(state);
 
   // video state
   const videoDurationBrut = useAsyncMemo(async () => {
@@ -43,11 +49,17 @@ const Timeline = ({ video }) => {
 
   const cutStartTime = useMemo(() => {
     if (state && sliderContainerRef.current && videoDurationBrut) {
-      return getVideoPosition(
-        sliderContainerRef.current,
+      const sliderRect = sliderContainerRef.current.getBoundingClientRect();
+
+      const videoElementWidth = (state.scale * sliderRect.width) / prevScale;
+
+      const time = getVideoPosition(
+        videoElementWidth,
         videoDurationBrut,
         state.cutStartPosition
       );
+
+      return time;
     } else {
       return 0;
     }
@@ -55,18 +67,28 @@ const Timeline = ({ video }) => {
 
   const cutEndTime = useMemo(() => {
     if (state && sliderContainerRef.current && videoDurationBrut) {
-      return (
+      const sliderRect = sliderContainerRef.current.getBoundingClientRect();
+
+      const videoElementWidth = (state.scale * sliderRect.width) / prevScale;
+
+      const time =
         videoDurationBrut -
         getVideoPosition(
-          sliderContainerRef.current,
+          videoElementWidth,
           videoDurationBrut,
           state.cutEndPosition
-        )
-      );
+        );
+
+      return time;
     } else {
       return videoDurationBrut;
     }
-  }, [state.cutEndPosition, sliderContainerRef, videoDurationBrut]);
+  }, [
+    state.cutEndPosition,
+    sliderContainerRef.current,
+    videoDurationBrut,
+    state.scale,
+  ]);
 
   const chunkSizeInMB = useMemo(() => {
     if (video.size && videoDurationBrut) {
@@ -79,10 +101,12 @@ const Timeline = ({ video }) => {
   }, [video.size, videoDurationBrut, cutStartTime, cutEndTime]);
 
   const mooveSlider = (event) => {
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+
     if (state.isDraggingLeft) {
       const sliderRect = sliderContainerRef.current.getBoundingClientRect();
       const xLeftPosition = moveSidebarLeft(
-        event,
+        { clientX },
         sliderRect,
         sliderLeftRef.current,
         minDistanceInPixels,
@@ -97,7 +121,7 @@ const Timeline = ({ video }) => {
     if (state.isDraggingRight) {
       const sliderRect = sliderContainerRef.current.getBoundingClientRect();
       const xRightPosition = moveSidebarRight(
-        event,
+        { clientX },
         sliderRect,
         sliderRightRef.current,
         minDistanceInPixels,
@@ -120,31 +144,79 @@ const Timeline = ({ video }) => {
     }
   };
 
+  const adaptZoom = (newScale) => {
+    const sliderRect = sliderContainerRef.current.getBoundingClientRect();
+    zoomSliderWidth = sliderRect.width;
+
+    const newCutStartPosition =
+      (state.cutStartPosition * newScale) / state.scale;
+    const newCutEndPosition = (state.cutEndPosition * newScale) / state.scale;
+
+    dispatch({
+      type: actionsType.MOVE_SLIDER,
+      startXPosition: newCutStartPosition,
+    });
+    sliderLeftRef.current.style.left = newCutStartPosition + "px";
+
+    dispatch({
+      type: actionsType.MOVE_SLIDER_END,
+      startXPosition: newCutEndPosition,
+    });
+
+    sliderRightRef.current.style.left =
+      (zoomSliderWidth * newScale) / state.scale -
+      newCutEndPosition -
+      sliderRightRef.current.getBoundingClientRect().width * 2 +
+      "px";
+  };
+
+  const zoomIn = () => {
+    if (state.scale < max_zoom_scale) {
+      dispatch({ type: actionsType.ZOOM_IN });
+      const newScale = state.scale + zoom_scale;
+      adaptZoom(newScale);
+    }
+  };
+
+  const zoomOut = () => {
+    if (state.scale > min_zoom_scale) {
+      dispatch({ type: actionsType.ZOOM_OUT });
+
+      const newScale = state.scale - zoom_scale;
+      adaptZoom(newScale);
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      prevScale = state.scale;
+    }, 500);
+  }, [state.scale]);
   return (
     <div className="border border-white/25 shadow-sm shadow-white/10 bg-black m-4 text-white rounded-xl">
-      <div className="border-b border-white/25">
-        <div className="flex justify-between gap-1 m-2 overflow-hidden">
-          <div>0s</div>
-          <div>1s</div>
-          <div>2s</div>
+      {/* <div className="border-b border-white/25">
+          <div className="flex justify-between gap-1 m-2 overflow-hidden">
           {Array.from(
             { length: Math.ceil((videoDurationBrut || 0) / 1) },
             (_, i) => (
               <div key={i}>{i}s</div>
             )
           )}
-        </div>
-      </div>
+        </div> 
+      </div>*/}
       <div className="p-2">
-        <div className="h-8 bg-white/15 rounded-md">
+        <div className="h-full bg-white/15 rounded-md p-1 overflow-y-hidden overflow-x-auto">
           <div
             ref={sliderContainerRef}
             onMouseMove={mooveSlider}
             onMouseUp={untrackDragging}
-            className="slider"
+            onTouchMove={mooveSlider}
+            onTouchEnd={untrackDragging}
+            className="slider min-h-8"
             style={{
               "--start-time-position": state.cutStartPosition + "px",
               "--end-time-position": state.cutEndPosition + "px",
+              width: state.scale * 100 + "vw",
             }}
           >
             <div className="h-full w-px absolute top-0 left-0">
@@ -154,10 +226,19 @@ const Timeline = ({ video }) => {
                   onMouseDown={() => {
                     dispatch({ type: actionsType.START_DRAG_LEFT });
                   }}
+                  onTouchStart={() =>
+                    dispatch({ type: actionsType.START_DRAG_LEFT })
+                  }
                   className={`absolute h-[80%] w-px bg-white/50 rounded border-2 border-white/50 cursor-pointer ${
                     state.isDraggingLeft ? "scale-150" : ""
                   } hover:scale-150 transition duration-200`}
-                ></div>
+                >
+                  <div className="relative z-20">
+                    <div className="absolute bottom-0 left-0 -translate-x-1/2 translate-y-full bg-black px-1 rounded-xl">
+                      {convertToHHMMSS(cutStartTime)}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -168,10 +249,19 @@ const Timeline = ({ video }) => {
                   onMouseDown={() => {
                     dispatch({ type: actionsType.START_DRAG_RIGHT });
                   }}
+                  onTouchStart={() =>
+                    dispatch({ type: actionsType.START_DRAG_RIGHT })
+                  }
                   className={`absolute h-[80%] w-px bg-white/50 rounded border-2 border-white/50 cursor-pointer ${
                     state.isDraggingRight ? "scale-150" : ""
                   } hover:scale-150 transition duration-200`}
-                ></div>
+                >
+                  <div className="relative z-20">
+                    <div className="absolute bottom-0 left-0 -translate-x-1/2 translate-y-full bg-black px-1 rounded-xl">
+                      {convertToHHMMSS(cutEndTime)}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -180,7 +270,10 @@ const Timeline = ({ video }) => {
       <div className="px-2 pb-2">
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <button className="f-btn active:scale-110 transition duration-300">
+            <button
+              className="f-btn active:scale-110 transition duration-300"
+              onClick={zoomIn}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -197,7 +290,10 @@ const Timeline = ({ video }) => {
               </svg>
             </button>
 
-            <button className="f-btn active:scale-110 transition duration-300">
+            <button
+              className="f-btn active:scale-110 transition duration-300"
+              onClick={zoomOut}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

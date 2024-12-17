@@ -8,6 +8,13 @@ const actionsType = {
   PLAY_VIDEO: "PLAY_VIDEO",
   PAUSE_VIDEO: "PAUSE_VIDEO",
   SET_CUT_VIDEO: "SET_CUT_VIDEO",
+  ZOOM_IN: "ZOOM_IN",
+  ZOOM_OUT: "ZOOM_OUT",
+  UPDATE_DRAG_ACCORDING_ZOOM: "UPDATE DRAG ACCORDING ZOOM",
 };
+
+export const min_zoom_scale = 1;
+export const max_zoom_scale = 3;
+export const zoom_scale = 0.5;
 
 export default actionsType;

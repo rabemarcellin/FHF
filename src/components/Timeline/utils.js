@@ -18,9 +18,24 @@ export const moveSidebarLeft = (
   minDistanceInPixels,
   cutEndPosition
 ) => {
-  const dragPositionX = mouseMoveEvent.clientX;
-  const deltaXPosition = dragPositionX - sliderRect.left;
+  const dragXPosition = mouseMoveEvent.clientX;
+  return moveSidebarLeftElement(
+    sliderRect,
+    sidebarLeft,
+    dragXPosition,
+    cutEndPosition,
+    minDistanceInPixels
+  );
+};
 
+export const moveSidebarLeftElement = (
+  sliderRect,
+  sidebarLeft,
+  dragXPosition,
+  cutEndPosition,
+  minDistanceInPixels
+) => {
+  const deltaXPosition = dragXPosition - sliderRect.left;
   let slideXSliderPosition = deltaXPosition;
 
   if (deltaXPosition <= 0) {
@@ -44,11 +59,25 @@ export const moveSidebarRight = (
   minDistanceInPixels,
   cutStartPosition
 ) => {
-  const dragPositionX = mouseMoveEvent.clientX;
+  const dragXPosition = mouseMoveEvent.clientX;
+  return moveSidebarRightElement(
+    sliderRect,
+    sidebarRight,
+    dragXPosition,
+    cutStartPosition,
+    minDistanceInPixels
+  );
+};
+
+export const moveSidebarRightElement = (
+  sliderRect,
+  sidebarRight,
+  dragXPosition,
+  cutStartPosition,
+  minDistanceInPixels
+) => {
+  const deltaXPosition = dragXPosition - sliderRect.left;
   const sidebarRect = sidebarRight.getBoundingClientRect();
-
-  const deltaXPosition = dragPositionX - sliderRect.left;
-
   let slideXSliderPosition = deltaXPosition;
 
   if (deltaXPosition <= cutStartPosition + minDistanceInPixels) {
@@ -64,13 +93,30 @@ export const moveSidebarRight = (
 // todo: assigner la longueur du sliderbar en fonction de la longueur de la video
 // todo: trouver le delta, entre le point de début et le point ou se trouve le drag => position ou se situe le sidebar dans la vidéo
 export const getVideoPosition = (
-  sliderElement,
+  videoElementWidth,
   videoDuration,
   relativeXSliderPosition
 ) => {
-  const sliderRect = sliderElement.getBoundingClientRect();
   /* const relativeXSliderPosition = slideBarElement.offsetLeft; */
+
   const videoPosition =
-    (relativeXSliderPosition / sliderRect.width) * videoDuration;
+    (relativeXSliderPosition / videoElementWidth) * videoDuration;
   return videoPosition || 0;
+};
+
+export const adjustSidebarPositionsOnZoom = (
+  prevliderWidth,
+  newSliderWidth,
+  prevStartPosition,
+  prevEndPosition
+) => {
+  // Ajustement proportionnel des positions
+  const newStartPosition =
+    (prevStartPosition / prevliderWidth) * newSliderWidth;
+  const newEndPosition = (prevEndPosition / prevliderWidth) * newSliderWidth;
+
+  return {
+    newStartPosition: newStartPosition || prevStartPosition,
+    newEndPosition: newEndPosition || prevEndPosition,
+  };
 };
