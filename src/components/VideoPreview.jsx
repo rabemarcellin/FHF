@@ -155,8 +155,8 @@ const VideoPreview = ({
 
   return (
     videoPreviewSrc && (
-      <div className="h-full bg-white flex items-center justify-center p-2">
-        <div className="h-[85vh] min-w-96 w-96 rounded-2xl overflow-y-hidden overflow-x-auto">
+      <div className="h-full bg-white flex items-center justify-center md:p-2">
+        <div className="h-full md:h-[85vh] w-full md:min-w-96 md:w-96 md:rounded-2xl overflow-y-hidden overflow-x-auto">
           <div
             className="relative flex w-full h-full bg-black mx-auto justify-center items-center video-preview overflow-hidden"
             style={{

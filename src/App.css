@@ -184,16 +184,16 @@
   }
 
   .slider {
-    @apply h-full bg-black/50 rounded border-2 border-white/50 relative;
+    @apply h-full bg-white/50 rounded-md overflow-hidden border-2 border-black/50  relative;
   }
 
   .slider::before {
-    @apply content-[''] absolute h-full top-0 left-0 bg-white/15;
+    @apply content-[''] absolute h-full top-0 left-0 bg-black/75;
     width: var(--start-time-position);
   }
 
   .slider::after {
-    @apply content-[''] absolute h-full top-0 right-0 bg-white/15;
+    @apply content-[''] absolute h-full top-0 right-0 bg-black/75;
     width: var(--end-time-position);
   }
 }
