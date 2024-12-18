@@ -257,7 +257,7 @@ const Timeline = ({ video }) => {
   };
 
   const dragAllSlider = (event) => {
-    const { clientX } = event;
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
 
     const sliderRect = sliderContainerRef.current.getBoundingClientRect();
     const sliderWidth = sliderRect.width;
@@ -295,6 +295,7 @@ const Timeline = ({ video }) => {
             onMouseMove={mooveSlider}
             onTouchMove={mooveSlider}
             onMouseDown={dragAllSlider}
+            onTouchStart={dragAllSlider}
             onMouseUp={untrackDragging}
             onTouchEnd={untrackDragging}
             className="slider min-h-8"
