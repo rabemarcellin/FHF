@@ -25,18 +25,19 @@ const initialState = {
 let zoomSliderWidth = 0;
 let prevScale = 1;
 
-const Timeline = ({ video }) => {
+const Timeline = ({ video, player }) => {
   // timeline state
   const sliderContainerRef = useRef(null);
   const sliderLeftRef = useRef(null);
   const sliderRightRef = useRef(null);
+  const containerRef = useRef(null);
+  const videoPositionRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isDrag, setIsDrag] = useState(false);
   const [dragPointer, setDragPointer] = useState(0);
   // video state
   const videoDurationBrut = useAsyncMemo(async () => {
     const duration = await getVideoDurationInSeconds(video);
-    console.log("duration : ", duration);
     return duration;
   }, [video]);
   const [minDistanceInPixels, setMinDistanceInPixels] = useState(0);
@@ -125,6 +126,7 @@ const Timeline = ({ video }) => {
     const sliderBarWidth = sliderLeftRef.current.getBoundingClientRect().width;
     const endPosition = sliderWidth - state.cutEndPosition - sliderBarWidth * 2;
     const clientXFromSlider = clientX - sliderRect.left;
+
     if (
       state.cutStartPosition < clientXFromSlider &&
       clientXFromSlider < endPosition
@@ -152,7 +154,6 @@ const Timeline = ({ video }) => {
         newEnd = Math.min(newEnd, state.cutEndPosition);
         newEndPosition = Math.min(newEndPosition, endPosition);
       }
-      console.log(sliderRect, sliderWidth - sliderBarWidth, newEndPosition);
       if (newEnd === 0) {
         newStart = Math.min(newStart, state.cutStartPosition);
       }
@@ -175,7 +176,6 @@ const Timeline = ({ video }) => {
 
     if (state.isDraggingLeft) {
       const sliderRect = sliderContainerRef.current.getBoundingClientRect();
-      console.log("min d in p", minDistanceInPixels);
       const xLeftPosition = moveSidebarLeft(
         { clientX },
         sliderRect,
@@ -211,6 +211,14 @@ const Timeline = ({ video }) => {
     dispatch({ type: actionsType.END_DRAG_RIGHT });
 
     setIsDrag(false);
+
+    sliderContainerRef.current.classList.remove("cursor-grabbing");
+
+    setDragPointer(0);
+    containerRef.current.classList.replace(
+      "overflow-x-hidden",
+      "overflow-x-auto"
+    );
   };
 
   const adaptZoom = (newScale) => {
@@ -270,11 +278,22 @@ const Timeline = ({ video }) => {
     ) {
       setIsDrag(true);
       setDragPointer(clientXFromSlider);
+
+      containerRef.current.classList.replace(
+        "overflow-x-auto",
+        "overflow-x-hidden"
+      );
     }
+  };
+
+  const lock = async () => {
+    var myScreenOrientation = window.screen.orientation;
+    myScreenOrientation.lock(myScreenOrientation.type);
   };
   useEffect(() => {
     document.addEventListener("mouseup", untrackDragging);
     document.addEventListener("touchend", untrackDragging);
+    lock();
 
     return () => {
       document.removeEventListener("mouseup", untrackDragging);
@@ -286,10 +305,75 @@ const Timeline = ({ video }) => {
       prevScale = state.scale;
     }, 500);
   }, [state.scale]);
+
   return (
-    <div className="border border-white/25 shadow-sm shadow-white/10 bg-black m-4 text-white rounded-xl">
-      <div className="p-2">
-        <div className="h-full bg-black rounded-md p-1 overflow-y-hidden overflow-x-auto">
+    <div className="border border-white/25 shadow-sm shadow-white/10 bg-black m-4 mr-0 text-white rounded-xl">
+      <div className="pb-2">
+        <div className="flex items-center justify-center">
+          {state.isPlaying ? (
+            <div
+              className="tooltip tooltip-right z-10 bg-black/50 rounded-full p-px m-px"
+              data-tip="Pause"
+              onClick={() => {
+                dispatch({ type: actionsType.PAUSE_VIDEO });
+                if (player.current) {
+                  player.current.pause();
+                }
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+            </div>
+          ) : (
+            <div
+              className="tooltip tooltip-right z-10 bg-black/50 rounded-full p-px m-px"
+              data-tip="Play"
+              onClick={() => {
+                dispatch({ type: actionsType.PLAY_VIDEO });
+                if (player.current) {
+                  player.current.play();
+                }
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <div
+          ref={containerRef}
+          className="h-full bg-black rounded-md p-1 relative overflow-x-auto"
+        >
           <div
             ref={sliderContainerRef}
             onMouseMove={mooveSlider}
@@ -305,6 +389,7 @@ const Timeline = ({ video }) => {
               width: state.scale * 100 + "%",
             }}
           >
+            <div className="h-1 w-full absolute bottom-0 lef-0 bg-blue-500 z-20"></div>
             <div className="h-full w-px absolute top-0 left-0">
               <div className="relative flex items-center h-full ">
                 <div
@@ -399,62 +484,7 @@ const Timeline = ({ video }) => {
 
             <div>{chunkSizeInMB + "MB"}</div>
           </div>
-          {/*  <div>
-            {state.isPlaying ? (
-              <div
-                className="tooltip tooltip-top z-10"
-                data-tip="Pause"
-                onClick={() => {
-                  dispatch({ type: actionsType.PAUSE_VIDEO });
-                }}
-              >
-                <svg
-                 
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-              </div>
-            ) : (
-              <div
-                className="tooltip tooltip-top z-10 bg-black/50 rounded-full p-px m-px"
-                data-tip="Play"
-                onClick={() => {
-                  dispatch({ type: actionsType.PLAY_VIDEO });
-                }}
-              >
-                <svg
-             
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.91 11.672a.375.375 0 0 1 0 .656l-5.603 3.113a.375.375 0 0 1-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112Z"
-                  />
-                </svg>
-              </div>
-            )}
-          </div> */}
+
           <div className="flex justify-end gap-1">
             <section>
               <svg

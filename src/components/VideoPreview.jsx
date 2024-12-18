@@ -157,17 +157,7 @@ const VideoPreview = ({
     videoPreviewSrc && (
       <div className="h-full bg-white flex items-center justify-center md:p-2">
         <div className="h-full md:h-[85vh] w-full md:min-w-96 md:w-96 md:rounded-2xl overflow-y-hidden overflow-x-auto">
-          <div
-            className="relative flex w-full h-full bg-black mx-auto justify-center items-center video-preview overflow-hidden"
-            style={{
-              "--start-time-percent": `${
-                100 - (startTime / videoPreviewDuration) * 100
-              }%`,
-              "--end-time-percent": `${
-                (endTime / videoPreviewDuration) * 100
-              }%`,
-            }}
-          >
+          <div className="relative flex w-full h-full bg-black mx-auto justify-center items-center video-preview overflow-hidden">
             <div className="action action--top">
               <div className="flex justify-end m-4">
                 <button
@@ -200,55 +190,33 @@ const VideoPreview = ({
             </video>
 
             <div className="action action--bottom">
-              <div
-                className={`transition duration-300 ease-in-out  ${
-                  showTimeline ? "opacity-1" : "hidden opacity-0"
-                }`}
-              >
-                <Timeline video={videoPreview} />
-              </div>
-              <div className="flex justify-end gap-2 m-4">
-                <button
-                  className="f-btn"
-                  data-tip="Timeline"
-                  onClick={() => setShowTimeline(!showTimeline)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="white"
-                    className="size-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                    />
-                  </svg>
-                </button>
+              <div className="flex items-end">
+                <div className="flex-1">
+                  <Timeline video={videoPreview} player={videoPreviewRef} />
+                </div>
 
-                <button
-                  onClick={exitFullScreen}
-                  className="f-btn"
-                  data-tip="Uploader"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="white"
-                    className="size-4"
+                <div className="flex flex-col justify-end gap-2 m-4">
+                  <button
+                    onClick={exitFullScreen}
+                    className="f-btn"
+                    data-tip="Uploader"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="white"
+                      className="size-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
