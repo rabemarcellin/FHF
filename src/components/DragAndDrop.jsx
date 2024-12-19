@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import {
@@ -29,8 +29,37 @@ export default function DragAndDrop({ activeUploads }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [videoSize, setVideoSize] = useState(null);
 
+  const fullScreenRef = useRef(0);
+
   // full-screen handler
-  const handleFullScreen = useFullScreenHandle();
+
+  const openFullscreen = () => {
+    const elem = fullScreenRef.current;
+    if (!elem) return;
+
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  };
+
+  /* Close fullscreen */
+  const closeFullscreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      /* IE11 */
+      document.msExitFullscreen();
+    }
+  };
 
   const initUploadProgress = () => setUploadProgress(0);
   const { ffmpeg } = useContext(AppContext);
@@ -55,10 +84,9 @@ export default function DragAndDrop({ activeUploads }) {
 
       if (video) {
         setVideoPreview(video);
-        await handleFullScreen.enter();
+        openFullscreen();
       }
     } catch (error) {}
-    await handleFullScreen.enter();
 
     /*  try {
       initUploadProgress();
@@ -132,10 +160,19 @@ export default function DragAndDrop({ activeUploads }) {
     document.getElementById(recoveryModalId).showModal();
   };
 
-  const exitFullScreen = async () => {
-    await handleFullScreen.exit();
+  const exitFullScreen = () => {
+    closeFullscreen();
     cleanVideoState();
   };
+
+  useEffect(() => {
+    document.addEventListener("fullscreenchange", (event) => {
+      if (!document.fullscreenElement) {
+        event.preventDefault();
+        exitFullScreen();
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -238,17 +275,16 @@ export default function DragAndDrop({ activeUploads }) {
       </div>
 
       <UploadProgress uploadProgress={uploadProgress} videoSize={videoSize} />
-
-      {videoPreview && (
-        <FullScreen handle={handleFullScreen}>
+      <div ref={fullScreenRef}>
+        {videoPreview && (
           <VideoPreview
             videoPreview={videoPreview}
             videoPreviewDuration={videoPreviewDuration}
             uploadVideo={uploadVideo}
             exitFullScreen={exitFullScreen}
           />
-        </FullScreen>
-      )}
+        )}
+      </div>
 
       {videoToken && (
         <div className=" p-2 my-4">

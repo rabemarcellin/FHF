@@ -20,28 +20,31 @@ const initialState = {
   cutEndPosition: 0,
   cutVideoSize: 0,
   scale: 1,
+  playerPosition: 0,
 };
 
 let zoomSliderWidth = 0;
 let prevScale = 1;
 
-const Timeline = ({ video, player }) => {
+const Timeline = ({ video, player, setStartTime, setEndTime }) => {
   // timeline state
   const sliderContainerRef = useRef(null);
   const sliderLeftRef = useRef(null);
   const sliderRightRef = useRef(null);
   const containerRef = useRef(null);
-  const videoPositionRef = useRef(null);
+  const playerTimelineRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isDrag, setIsDrag] = useState(false);
+  const [isDragPlayer, setIsDragPlayer] = useState(false);
   const [dragPointer, setDragPointer] = useState(0);
+  const [previewInterval, setPreviewInterval] = useState(null);
   // video state
   const videoDurationBrut = useAsyncMemo(async () => {
     const duration = await getVideoDurationInSeconds(video);
     return duration;
   }, [video]);
   const [minDistanceInPixels, setMinDistanceInPixels] = useState(0);
-
+  const [playerPosition, setPlayerPosition] = useState(0);
   const cutStartTime = useMemo(() => {
     if (state && sliderContainerRef.current && videoDurationBrut) {
       const sliderRect = sliderContainerRef.current.getBoundingClientRect();
@@ -53,7 +56,7 @@ const Timeline = ({ video, player }) => {
         videoDurationBrut,
         state.cutStartPosition
       );
-
+      setStartTime(time);
       return time;
     } else {
       return 0;
@@ -73,7 +76,7 @@ const Timeline = ({ video, player }) => {
           videoDurationBrut,
           state.cutEndPosition
         );
-
+      setEndTime(time);
       return time;
     } else {
       return videoDurationBrut;
@@ -85,26 +88,30 @@ const Timeline = ({ video, player }) => {
     state.scale,
   ]);
 
+  useEffect(() => {}, []);
+
   useEffect(() => {
     dispatch({
       type: actionsType.MOVE_SLIDER_END,
       startXPosition: 0,
     });
     const moveSidebarRightAsync = setInterval(() => {
-      const sliderRect = sliderContainerRef.current.getBoundingClientRect();
-      const sliderRightRect = sliderRightRef.current.getBoundingClientRect();
+      if (sliderContainerRef.current && sliderRightRef.current) {
+        const sliderRect = sliderContainerRef.current.getBoundingClientRect();
+        const sliderRightRect = sliderRightRef.current.getBoundingClientRect();
 
-      if (sliderRect.width > 0 && sliderRightRect.width > 0) {
-        clearInterval(moveSidebarRightAsync);
-        sliderRightRef.current.style.left =
-          sliderContainerRef.current.offsetWidth -
-          sliderRightRef.current.offsetWidth * 3 +
-          "px";
+        if (sliderRect.width > 0 && sliderRightRect.width > 0) {
+          clearInterval(moveSidebarRightAsync);
+          sliderRightRef.current.style.left =
+            sliderContainerRef.current.offsetWidth -
+            sliderRightRef.current.offsetWidth * 3 +
+            "px";
 
-        const sliderWidth =
-          sliderContainerRef.current.getBoundingClientRect().width;
+          const sliderWidth =
+            sliderContainerRef.current.getBoundingClientRect().width;
 
-        setMinDistanceInPixels((10 / videoDurationBrut) * sliderWidth);
+          setMinDistanceInPixels((10 / videoDurationBrut) * sliderWidth);
+        }
       }
     }, 200);
   }, [videoDurationBrut]);
@@ -205,7 +212,7 @@ const Timeline = ({ video, player }) => {
     }
   };
 
-  const untrackDragging = () => {
+  const untrackDragging = (event) => {
     dispatch({ type: actionsType.END_DRAG_LEFT });
 
     dispatch({ type: actionsType.END_DRAG_RIGHT });
@@ -286,18 +293,35 @@ const Timeline = ({ video, player }) => {
     }
   };
 
-  const lock = async () => {
-    var myScreenOrientation = window.screen.orientation;
-    myScreenOrientation.lock(myScreenOrientation.type);
+  const handlePlayerMouseMove = (event) => {
+    const playerTimelineRect =
+      playerTimelineRef.current.getBoundingClientRect();
+
+    const point = {
+      x: event.touches[0].pageX - playerTimelineRect.left,
+      y: event.touches[0].pageY - playerTimelineRect.top,
+    };
+
+    if (
+      false ==
+      (point.x >= 0 &&
+        point.x <= playerTimelineRect.width &&
+        point.y >= 0 &&
+        point.y <= playerTimelineRect.height)
+    ) {
+      handlePlayerDrag(event);
+      setIsDragPlayer(false);
+    }
   };
   useEffect(() => {
     document.addEventListener("mouseup", untrackDragging);
     document.addEventListener("touchend", untrackDragging);
-    lock();
+    document.addEventListener("touchmove", handlePlayerMouseMove);
 
     return () => {
       document.removeEventListener("mouseup", untrackDragging);
       document.removeEventListener("touchend", untrackDragging);
+      document.removeEventListener("mousemove", handlePlayerMouseMove);
     };
   }, []);
   useEffect(() => {
@@ -306,18 +330,58 @@ const Timeline = ({ video, player }) => {
     }, 500);
   }, [state.scale]);
 
+  const handlePlayerDrag = (event) => {
+    if (isDragPlayer) {
+      const playerTimelineRect =
+        playerTimelineRef.current.getBoundingClientRect();
+      const position = event.clientX - playerTimelineRect.left;
+
+      const videoTime =
+        (position / playerTimelineRect.width) * videoDurationBrut;
+      player.current.currentTime = videoTime;
+      if (playerTimelineRef.current && player.current) {
+        const playerTimelineRect =
+          playerTimelineRef.current.getBoundingClientRect();
+        setPlayerPosition(
+          (playerTimelineRect.width * videoTime) / videoDurationBrut
+        );
+      }
+    }
+  };
+
   return (
     <div className="border border-white/25 shadow-sm shadow-white/10 bg-black m-4 mr-0 text-white rounded-xl">
       <div className="pb-2">
-        <div className="flex items-center justify-center">
+        <div className="text-center mt-1">
+          {convertToHHMMSS(player.current?.currentTime || 0)}
+        </div>
+        <div className="mb-2 flex items-center justify-center gap-2">
+          <button className="tooltip tooltip-left" data-tip="Prev">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z"
+              />
+            </svg>
+          </button>
           {state.isPlaying ? (
             <div
-              className="tooltip tooltip-right z-10 bg-black/50 rounded-full p-px m-px"
+              className="tooltip tooltip-bottom z-10 bg-black/50 rounded-full p-px m-px"
               data-tip="Pause"
               onClick={() => {
                 dispatch({ type: actionsType.PAUSE_VIDEO });
                 if (player.current) {
                   player.current.pause();
+                  clearInterval(previewInterval);
+                  setPreviewInterval(null);
                 }
               }}
             >
@@ -338,12 +402,37 @@ const Timeline = ({ video, player }) => {
             </div>
           ) : (
             <div
-              className="tooltip tooltip-right z-10 bg-black/50 rounded-full p-px m-px"
+              className="tooltip tooltip-bottom z-10 bg-black/50 rounded-full p-px m-px"
               data-tip="Play"
               onClick={() => {
                 dispatch({ type: actionsType.PLAY_VIDEO });
                 if (player.current) {
+                  if (player.current.currentTime === videoDurationBrut) {
+                    player.current.currentTime = 0;
+                    setPlayerPosition(0);
+                  }
                   player.current.play();
+
+                  const interval = setInterval(() => {
+                    const currentTime = player.current?.currentTime;
+                    if (playerTimelineRef.current && currentTime) {
+                      const playerTimelineRect =
+                        playerTimelineRef.current.getBoundingClientRect();
+                      setPlayerPosition(
+                        (playerTimelineRect.width * currentTime) /
+                          videoDurationBrut
+                      );
+                    }
+
+                    if (currentTime >= videoDurationBrut) {
+                      player.current.pause();
+                      clearInterval(interval);
+                      setPreviewInterval(null);
+                      dispatch({ type: actionsType.PAUSE_VIDEO });
+                    }
+                  }, 1000);
+
+                  setPreviewInterval(interval);
                 }
               }}
             >
@@ -368,11 +457,28 @@ const Timeline = ({ video, player }) => {
               </svg>
             </div>
           )}
+
+          <button className="tooltip tooltip-right" data-tip="Next">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
+              />
+            </svg>
+          </button>
         </div>
 
         <div
           ref={containerRef}
-          className="h-full bg-black rounded-md p-1 relative overflow-x-auto"
+          className="h-full bg-black/50 rounded-md p-1 relative overflow-x-auto"
         >
           <div
             ref={sliderContainerRef}
@@ -389,7 +495,41 @@ const Timeline = ({ video, player }) => {
               width: state.scale * 100 + "%",
             }}
           >
-            <div className="h-1 w-full absolute bottom-0 lef-0 bg-blue-500 z-20"></div>
+            <div
+              ref={playerTimelineRef}
+              className="h-1 w-full absolute bottom-0 left-0 bg-white/50 z-20 cursor-pointer"
+              onMouseDown={() => {
+                setIsDragPlayer(true);
+              }}
+              onTouchStart={() => {
+                setIsDragPlayer(true);
+              }}
+              onMouseMove={handlePlayerDrag}
+              onTouchMove={handlePlayerDrag}
+              onTouchEnd={(event) => {
+                handlePlayerDrag(event);
+                setIsDragPlayer(false);
+              }}
+              onMouseUp={(event) => {
+                handlePlayerDrag(event);
+                setIsDragPlayer(false);
+              }}
+              onTouchCancel={(event) => {
+                handlePlayerDrag(event);
+                setIsDragPlayer(false);
+              }}
+              onMouseLeave={(event) => {
+                handlePlayerDrag(event);
+                setIsDragPlayer(false);
+              }}
+            >
+              <div
+                className="absolute top-0 left-0 w-2 h-full bg-blue-500"
+                style={{
+                  width: playerPosition + "px",
+                }}
+              ></div>
+            </div>
             <div className="h-full w-px absolute top-0 left-0">
               <div className="relative flex items-center h-full ">
                 <div

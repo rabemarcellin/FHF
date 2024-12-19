@@ -54,10 +54,16 @@ export default function Upload() {
     if (!isInside) setIsScrollTop(false);
   };
 
+  const lock = async () => {
+    const myScreenOrientation = window.screen.orientation;
+    myScreenOrientation.lock("portrait-primary");
+  };
+
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("wheel", handleWheel);
     window.addEventListener("touchmove", handleTouchMove);
+    lock();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);

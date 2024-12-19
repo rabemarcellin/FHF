@@ -192,7 +192,12 @@ const VideoPreview = ({
             <div className="action action--bottom">
               <div className="flex items-end">
                 <div className="flex-1">
-                  <Timeline video={videoPreview} player={videoPreviewRef} />
+                  <Timeline
+                    video={videoPreview}
+                    player={videoPreviewRef}
+                    setStartTime={setStartTime}
+                    setEndTime={setEndTime}
+                  />
                 </div>
 
                 <div className="flex flex-col justify-end gap-2 m-4">

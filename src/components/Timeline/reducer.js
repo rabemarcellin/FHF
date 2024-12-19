@@ -42,6 +42,10 @@ const reducer = (state, action) => {
       }
     }
 
+    case actionsType.MOVE_PREVIEW: {
+      return { ...state, videoPosition: action.videoPosition };
+    }
+
     case actionsType.UPDATE_DRAG_ACCORDING_ZOOM:
       return {
         ...state,

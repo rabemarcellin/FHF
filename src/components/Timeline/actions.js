@@ -11,10 +11,11 @@ const actionsType = {
   ZOOM_IN: "ZOOM_IN",
   ZOOM_OUT: "ZOOM_OUT",
   UPDATE_DRAG_ACCORDING_ZOOM: "UPDATE DRAG ACCORDING ZOOM",
+  MOVE_PREVIEW: "MOVE PREVIEW",
 };
 
 export const min_zoom_scale = 1;
-export const max_zoom_scale = 3;
+export const max_zoom_scale = 10;
 export const zoom_scale = 0.5;
 
 export default actionsType;
