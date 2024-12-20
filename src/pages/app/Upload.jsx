@@ -91,7 +91,7 @@ export default function Upload() {
       <AppNavbar />
       <div className="w-full lg:flex lg:justify-center  gap-4 px-4">
         <div className="w-full max-w-2xl mx-auto pt-4">
-          <DragAndDrop activeUploads={activeUploads} />
+          <DragAndDrop />
         </div>
         <div className="hidden lg:block w-full max-w-96 border m-4 h-fit bg-white shadow rounded-xl p-4">
           <ActiveUploads

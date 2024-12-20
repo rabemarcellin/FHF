@@ -88,8 +88,6 @@ const Timeline = ({ video, player, setStartTime, setEndTime }) => {
     state.scale,
   ]);
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     dispatch({
       type: actionsType.MOVE_SLIDER_END,
@@ -350,7 +348,7 @@ const Timeline = ({ video, player, setStartTime, setEndTime }) => {
   };
 
   return (
-    <div className="border border-white/25 shadow-sm shadow-white/10 bg-black m-4 mr-0 text-white rounded-xl">
+    <div className="border border-white/25 shadow-sm shadow-white/10 bg-black m-2 text-white rounded-xl">
       <div className="pb-2">
         <div className="text-center mt-1">
           {convertToHHMMSS(player.current?.currentTime || 0)}
@@ -511,10 +509,6 @@ const Timeline = ({ video, player, setStartTime, setEndTime }) => {
                 setIsDragPlayer(false);
               }}
               onMouseUp={(event) => {
-                handlePlayerDrag(event);
-                setIsDragPlayer(false);
-              }}
-              onTouchCancel={(event) => {
                 handlePlayerDrag(event);
                 setIsDragPlayer(false);
               }}

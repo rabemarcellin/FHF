@@ -197,3 +197,40 @@
     width: var(--end-time-position);
   }
 }
+
+.square {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  transform: translateY(25%);
+}
+
+.moving-svg {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  animation: move-square 3s linear infinite;
+}
+
+@keyframes move-square {
+  0% {
+    top: 0;
+    left: 0;
+  }
+  25% {
+    top: 0;
+    left: 5px;
+  }
+  50% {
+    top: 5px;
+    left: 5px;
+  }
+  75% {
+    top: 5px;
+    left: 0;
+  }
+  100% {
+    top: 0;
+    left: 0;
+  }
+}
