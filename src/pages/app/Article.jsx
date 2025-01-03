@@ -41,9 +41,9 @@ const Article = () => {
 
         <div className="flex-1 overflow-auto">
           <div className="h-screen">
-            <div className="max-w-4xl mx-auto p-4">
+            <div className="max-w-4xl mx-auto p-8 lg:p-4">
               <div className="grid md:grid-cols-2 lg:grid-cols-3 lg:justify-between gap-2">
-                <div className="article--item w-full">
+                <div className="article--item">
                   <h1 className="title">Titre de l'article</h1>
                 </div>
                 <div className="article--item">
