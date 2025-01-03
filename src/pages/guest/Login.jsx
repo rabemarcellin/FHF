@@ -42,7 +42,7 @@ export default function Login() {
         </div>
         <div className="">
           <div className="lg:p-4 pb-0 lg:pb-4 h-[80%] lg:h-full absolute lg:static top-[20%] w-full mx-auto">
-            <div className="bg-gradient-to-r from-[#e3ffe7] to-[#d9e7ff] h-full rounded-badge rounded-b-none lg:rounded-xl flex flex-col justify-center items-center">
+            <div className="bg-gradient-to-r from-[#e3ffe7] to-[#d9e7ff] h-full rounded-badge  lg:rounded-xl flex flex-col justify-center items-center">
               <div className="w-full p-4 self-start ">
                 <Link to="/" className="flex items-center gap-4">
                   <svg
