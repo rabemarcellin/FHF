@@ -93,7 +93,7 @@ export default function Upload() {
         <div className="w-full max-w-2xl mx-auto pt-4">
           <DragAndDrop />
         </div>
-        <div className="hidden lg:block w-full max-w-96 border m-4 h-fit bg-white shadow rounded-xl p-4">
+        <div className="hidden  w-full max-w-96 border m-4 h-fit bg-white shadow rounded-xl p-4">
           <ActiveUploads
             activeUploads={activeUploads}
             setActiveUploads={setActiveUploads}

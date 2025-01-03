@@ -37,7 +37,7 @@ const VideoPreview = ({ videoPreview, uploadTrimVideo, exitFullScreen }) => {
 
   return (
     videoPreviewSrc && (
-      <div className="h-full bg-white flex items-center justify-center md:p-2">
+      <div className="h-screen w-screen absolute top-0 left-0 z-20 bg-white flex items-center justify-center md:p-2">
         <div className="h-full md:h-[85vh] w-full md:min-w-96 md:w-96 md:rounded-2xl overflow-y-hidden overflow-x-auto">
           <div className="relative flex w-full h-full bg-black mx-auto justify-center items-center video-preview overflow-hidden">
             <div className="action action--top">
