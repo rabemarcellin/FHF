@@ -151,7 +151,7 @@ export default function Upload() {
             </div>
           </div>
         )}
-        <div className="block lg:hidden">
+        <div className="hidden">
           <Sheet
             rootId="here"
             isOpen={openResponsiveActiveUploads}
