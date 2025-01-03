@@ -80,11 +80,23 @@
     @apply bg-slate-100 w-screen overflow-x-hidden;
   }
   body {
-    @apply font-text text-sm lg:text-base overflow-x-hidden;
+    @apply font-text text-sm lg:text-base;
+  }
+
+  a.active {
+    @apply underline text-black font-bold;
+  }
+
+  a.menu-item.active {
+    @apply text-gray-500;
   }
 }
 
 @layer components {
+  /*Override Daysi Default style */
+  .btn {
+    @apply rounded-none;
+  }
   .input-w-max {
     width: max-content !important;
   }
@@ -195,6 +207,26 @@
   .slider::after {
     @apply content-[''] absolute h-full top-0 right-0 bg-black/75;
     width: var(--end-time-position);
+  }
+
+  .navbar-responsive__menu {
+    @apply flex flex-col gap-4 text-white text-xl px-4 h-full text-center;
+  }
+
+  .navbar-responsive__menu .menu-item {
+    @apply hover:bg-black/50 p-4 flex items-center justify-center rounded-none;
+  }
+
+  .navbar-responsive__menu .menu-item.primary {
+    @apply hover:bg-primary;
+  }
+
+  .article--item {
+    @apply border-2  h-72 bg-slate-100 p-4 flex items-end justify-end cursor-pointer hover:shadow-md hover:bg-white hover:scale-95 transition duration-300 ease-in-out;
+  }
+
+  .article--item .title {
+    @apply font-bold text-xl md:text-2xl;
   }
 }
 
