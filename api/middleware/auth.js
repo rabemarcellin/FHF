@@ -7,7 +7,7 @@ const bearerTokenMiddleware = async (req, res, next) => {
       const authorizationHeader = req.headers["authorization"];
       const authToken = authorizationHeader.replace(/^Bearer\s+/, "");
       try {
-        jwt.verify(token, AUTH_KEY);
+        req.user = jwt.verify(authToken, AUTH_KEY);
         req.authToken = authToken;
         next();
       } catch (error) {

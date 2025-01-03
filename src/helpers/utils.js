@@ -215,3 +215,26 @@ export const convertToHHMMSS = (val) => {
   }
   return time;
 };
+
+/**
+ * Checks if the user is logged in by verifying the presence and type of
+ * authentication tokens in local storage.
+ *
+ * @returns {boolean} - Returns true if both 'token' and 'refresh-token'
+ * are present in local storage and are valid strings, otherwise returns false.
+ */
+
+export const checkUserLogStatus = () => {
+  const userToken = localStorage.getItem("token");
+  const refreshToken = localStorage.getItem("refresh-token");
+
+  if (
+    userToken &&
+    refreshToken &&
+    typeof userToken.trim() === "string" &&
+    typeof refreshToken.trim() === "string"
+  )
+    return true;
+
+  return false;
+};

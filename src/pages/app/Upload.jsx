@@ -54,10 +54,16 @@ export default function Upload() {
     if (!isInside) setIsScrollTop(false);
   };
 
+  const lock = async () => {
+    const myScreenOrientation = window.screen.orientation;
+    myScreenOrientation.lock("portrait-primary");
+  };
+
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("wheel", handleWheel);
     window.addEventListener("touchmove", handleTouchMove);
+    lock();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -85,9 +91,9 @@ export default function Upload() {
       <AppNavbar />
       <div className="w-full lg:flex lg:justify-center  gap-4 px-4">
         <div className="w-full max-w-2xl mx-auto pt-4">
-          <DragAndDrop activeUploads={activeUploads} />
+          <DragAndDrop />
         </div>
-        <div className="hidden lg:block w-full max-w-96 border m-4 h-fit bg-white shadow rounded-xl p-4">
+        <div className="hidden  w-full max-w-96 border m-4 h-fit bg-white shadow rounded-xl p-4">
           <ActiveUploads
             activeUploads={activeUploads}
             setActiveUploads={setActiveUploads}
@@ -145,7 +151,7 @@ export default function Upload() {
             </div>
           </div>
         )}
-        <div className="block lg:hidden">
+        <div className="hidden">
           <Sheet
             rootId="here"
             isOpen={openResponsiveActiveUploads}

@@ -8,17 +8,29 @@ export default function Login() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [processLogin, setProcessLogin] = useState(false);
 
   const loginForm = async (event) => {
     event.preventDefault();
 
-    if (userName.length > 0 && password.length > 0) {
-      try {
-        await loginService(userName, password);
-        navigate("/dashboard");
-      } catch (error) {
-        console.error("error login service: ", error);
-        // update view
+    if (!processLogin) {
+      setProcessLogin(true);
+
+      if (userName.length > 0 && password.length > 0) {
+        try {
+          const isLogged = await loginService(userName, password);
+
+          if (isLogged) {
+            navigate("/dashboard");
+          } else {
+            throw new Error("cannot login");
+          }
+        } catch (error) {
+          console.error("error login service: ", error);
+          // update view
+        } finally {
+          setProcessLogin(false);
+        }
       }
     }
   };
@@ -29,8 +41,8 @@ export default function Login() {
           <img src={AuthIllustrationImg} alt="auth" className="cover-img" />
         </div>
         <div className="">
-          <div className="p-4 pb-0 lg:pb-4 h-[80%] lg:h-full absolute lg:static top-[20%] w-full mx-auto">
-            <div className="bg-gradient-to-r from-[#e3ffe7] to-[#d9e7ff] h-full rounded-badge rounded-b-none lg:rounded-xl flex flex-col justify-center items-center">
+          <div className="lg:p-4 pb-0 lg:pb-4 h-[80%] lg:h-full absolute lg:static top-[20%] w-full mx-auto">
+            <div className="bg-gradient-to-r from-[#e3ffe7] to-[#d9e7ff] h-full rounded-badge  lg:rounded-xl flex flex-col justify-center items-center">
               <div className="w-full p-4 self-start ">
                 <Link to="/" className="flex items-center gap-4">
                   <svg
@@ -39,7 +51,7 @@ export default function Login() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6"
+                    className="size-6 stroke-2"
                   >
                     <path
                       strokeLinecap="round"
@@ -48,11 +60,11 @@ export default function Login() {
                     />
                   </svg>
 
-                  <span className="font-mono">VideoUpload</span>
+                  <span className="font-black text-lg">FHF</span>
                 </Link>
               </div>
               <div className="flex-1 flex items-center justify-center">
-                <form action="" className="" onSubmit={loginForm}>
+                <form action="" className="p-4 m-4" onSubmit={loginForm}>
                   <label className="form-control w-full max-w-xs">
                     <div className="label">
                       <span className="label-text">Identifiant</span>
@@ -91,7 +103,11 @@ export default function Login() {
 
                   <div className="my-4">
                     <button className="btn btn-neutral rounded-badge w-80">
-                      Connexion
+                      {processLogin ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        "Connexion"
+                      )}
                     </button>
                   </div>
                 </form>

@@ -22,9 +22,9 @@ const RecoveryToken = ({ token }) => {
             <a
               href="https://www.facebook.com/profile.php?id=100089271829072"
               target="_blank"
-              className="font-mono bg-slate-50 hover:bg-slate-200 transition duration-300 p-1"
+              className="font-bold bg-slate-50 hover:bg-slate-200 transition duration-300 p-1"
             >
-              Fifohazanam-panahy
+              Fifohazam-panahy
             </a>{" "}
           </span>
           avec cette clé:{" "}

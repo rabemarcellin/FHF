@@ -13,7 +13,7 @@ export default function CopyableContent({ text }) {
   };
 
   return (
-    <div className="p-4 font-mono transition duration-300 hover:bg-slate-200 rounded-xl flex  gap-4 ">
+    <div className="p-4 text-gray-500 transition duration-300 hover:bg-slate-200 rounded-xl flex  gap-4 ">
       <p
         className="overflow-hidden truncate cursor-pointer select-none"
         onClick={handleCopy}

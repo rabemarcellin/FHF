@@ -1,42 +1,66 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import {
   createPartContainerService,
   endVideoPartService,
-  uploadStreamVideo,
   uploadVideoService,
 } from "../services/upload";
 import {
   getVideoDurationInSeconds,
-  handleStream,
+  sliceOneVideo,
   sliceVideo,
 } from "../helpers/utils";
 import RecoveryToken from "./RecoveryToken";
 import { recoveryModalId } from "../helpers/jsx-ids";
 import { AppContext } from "../contexts/AppContextProvider";
 import VideoPreview from "./VideoPreview";
-import UploadProgress from "./UploadProgress";
+import ExitFSModal from "./ExitFSModal";
 
-export default function DragAndDrop({ activeUploads }) {
+export default function DragAndDrop() {
   const inputRef = useRef(0);
   const [videoName, setVideoName] = useState(null);
   const [videoToken, setVideoToken] = useState(null);
-  const [loadVideo, setLoadVideo] = useState(false);
   const [uploadExceeded, setUploadExceeded] = useState(false);
   const [videoPreview, setVideoPreview] = useState(null);
-  const [videoPreviewDuration, setVideoPreviewDuration] = useState(0);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [videoSize, setVideoSize] = useState(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isUploadPending, setIsUploadPending] = useState(false);
+  const fullScreenRef = useRef(0);
 
-  const initUploadProgress = () => setUploadProgress(0);
+  // full-screen handler
+
+  const openFullscreen = () => {
+    const elem = fullScreenRef.current;
+    if (!elem) return;
+
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  };
+
+  /* Close fullscreen */
+  const closeFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      /* IE11 */
+      document.msExitFullscreen();
+    }
+  };
+
   const { ffmpeg } = useContext(AppContext);
   const cleanVideoState = () => {
     setVideoName(null);
     setVideoToken(null);
-    setVideoSize(0);
-    initUploadProgress();
     setVideoPreview(null);
-    setVideoPreviewDuration(0);
     inputRef.current.value = null;
   };
   const reInitUploader = () => {
@@ -44,68 +68,34 @@ export default function DragAndDrop({ activeUploads }) {
     inputRef.current.click();
   };
 
-  const handleUploadStream = async (event) => {
-    setLoadVideo(true);
-
+  const importVideoFromLocal = async (event) => {
     try {
-      initUploadProgress();
       const video = event.target.files[0];
-      if (!video) {
-        cleanVideoState();
-        return;
+      // Roadmap: verify imported is video and only one
+
+      if (video) {
+        setVideoPreview(video);
+        setIsFullScreen(true);
+        openFullscreen();
       }
-      setVideoPreview(video);
-
-      if (activeUploads.length >= 5) {
-        setUploadExceeded(true);
-
-        setTimeout(() => {
-          setUploadExceeded(false);
-        }, 5000);
-
-        return;
-      } else {
-      }
-      const videoDuration = await getVideoDurationInSeconds(video);
-
-      setVideoPreviewDuration(videoDuration);
-    } catch (error) {
-      if (error.message === "upload number attempts exceeded") {
-        setUploadExceeded(true);
-
-        setTimeout(() => {
-          setUploadExceeded(false);
-        }, 5000);
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setLoadVideo(false);
-    }
+    } catch (error) {}
   };
 
   const uploadVideo = async (video) => {
     const chunks = await sliceVideo(ffmpeg, video, 24);
 
-    setLoadVideo(false);
-
     const partToken = await createPartContainerService(video.size);
-    setVideoSize(parseInt(video.size));
     setVideoName(video.name);
     for (let position = 0; position < chunks.length; position++) {
-      console.log(chunks[position], video.size);
-      const uploadStatus = await uploadVideoService(
+      await uploadVideoService(
         chunks[position],
         partToken,
         video.name,
         position
       );
-
-      console.log("u_status: ", uploadStatus);
     }
     await endVideoPartService(partToken, video.size);
     setVideoToken(partToken);
-    setUploadProgress(video.size);
     showToken();
   };
 
@@ -119,14 +109,50 @@ export default function DragAndDrop({ activeUploads }) {
     document.getElementById(recoveryModalId).showModal();
   };
 
+  const exitFullScreen = () => {
+    setIsFullScreen(false);
+    closeFullscreen();
+  };
+
+  useEffect(() => {
+    document.addEventListener("fullscreenchange", (event) => {
+      if (!document.fullscreenElement) {
+        event.preventDefault();
+        confirmExitModal();
+      }
+    });
+  }, []);
+
+  const confirmExitModal = () => {
+    document.getElementById("modal_exit_fs").showModal();
+  };
+
+  const uploadTrimVideo = async (video, startTime, endTime) => {
+    try {
+      setIsUploadPending(true);
+      exitFullScreen();
+      const videoDuration = await getVideoDurationInSeconds(video);
+      if (startTime > 0 || endTime < videoDuration) {
+        const videoTrimmed = await sliceOneVideo(
+          ffmpeg,
+          video,
+          startTime,
+          endTime
+        );
+
+        await uploadVideo(videoTrimmed);
+      } else {
+        await uploadVideo(video);
+      }
+    } catch (error) {
+      console.error("error trime upload", error);
+    } finally {
+      setIsUploadPending(false);
+    }
+  };
+
   return (
     <>
-      {loadVideo && (
-        <div className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center gap-2 backdrop-blur z-10">
-          <span>Chargement de la video </span>
-          <span className="loading loading-dots loading-xs"></span>
-        </div>
-      )}
       {uploadExceeded && (
         <div className="absolute bottom-0 right-0 left-0 w-screen">
           <div className="flex items-center justify-center">
@@ -210,7 +236,7 @@ export default function DragAndDrop({ activeUploads }) {
 
           <input
             ref={inputRef}
-            onChange={handleUploadStream}
+            onChange={importVideoFromLocal}
             type="file"
             name="bank"
             accept="video/*"
@@ -219,15 +245,43 @@ export default function DragAndDrop({ activeUploads }) {
         </div>
       </div>
 
-      <UploadProgress uploadProgress={uploadProgress} videoSize={videoSize} />
-
-      {videoPreview && (
-        <VideoPreview
-          videoPreview={videoPreview}
-          videoPreviewDuration={videoPreviewDuration}
-          uploadVideo={uploadVideo}
-        />
+      {isUploadPending && !videoToken && (
+        <div className="my-4 text-center">
+          <p className="flex gap-4 items-center justify-center">
+            <span>Upload en cours...</span>
+            <div className="relative">
+              <div className="square">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-4 moving-svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </p>
+          <p>Ceci peut prendre un peu de temps. Ne reloader pas la page.</p>
+        </div>
       )}
+
+      <ExitFSModal exitFS={exitFullScreen} />
+      <div ref={fullScreenRef}>
+        {videoPreview && isFullScreen && (
+          <VideoPreview
+            videoPreview={videoPreview}
+            uploadTrimVideo={uploadTrimVideo}
+            exitFullScreen={confirmExitModal}
+          />
+        )}
+      </div>
 
       {videoToken && (
         <div className=" p-2 my-4">

@@ -1,0 +1,21 @@
+const actionsType = {
+  START_DRAG_LEFT: "START_LEFT_DRAG",
+  START_DRAG_RIGHT: "START_RIGHT_DRAG",
+  MOVE_SLIDER: "MOVE_SLIDER",
+  MOVE_SLIDER_END: "MOVE_SLIDER_END",
+  END_DRAG_LEFT: "END_DRAG_LEFT",
+  END_DRAG_RIGHT: "END_DRAG_RIGHT",
+  PLAY_VIDEO: "PLAY_VIDEO",
+  PAUSE_VIDEO: "PAUSE_VIDEO",
+  SET_CUT_VIDEO: "SET_CUT_VIDEO",
+  ZOOM_IN: "ZOOM_IN",
+  ZOOM_OUT: "ZOOM_OUT",
+  UPDATE_DRAG_ACCORDING_ZOOM: "UPDATE DRAG ACCORDING ZOOM",
+  MOVE_PREVIEW: "MOVE PREVIEW",
+};
+
+export const min_zoom_scale = 1;
+export const max_zoom_scale = 10;
+export const zoom_scale = 0.5;
+
+export default actionsType;

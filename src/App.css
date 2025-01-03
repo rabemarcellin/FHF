@@ -76,12 +76,27 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply bg-slate-100 w-screen overflow-x-hidden;
+  }
   body {
-    @apply font-text bg-slate-100 min-h-screen;
+    @apply font-text text-sm lg:text-base;
+  }
+
+  a.active {
+    @apply underline text-black font-bold;
+  }
+
+  a.menu-item.active {
+    @apply text-gray-500;
   }
 }
 
 @layer components {
+  /*Override Daysi Default style */
+  .btn {
+    @apply rounded-none;
+  }
   .input-w-max {
     width: max-content !important;
   }
@@ -158,5 +173,96 @@
     80% {
       transform: scale(1.2);
     }
+  }
+
+  /* Video preview */
+  .action {
+    @apply absolute left-0 w-full z-10 text-xs;
+  }
+
+  .action.action--top {
+    @apply top-0;
+  }
+
+  .action.action--bottom {
+    @apply bottom-0;
+  }
+
+  .action .f-btn {
+    @apply tooltip tooltip-left w-8 h-8 rounded-full bg-white/15 flex items-center justify-center cursor-pointer;
+    @apply transition duration-300 ease-in-out;
+    @apply hover:bg-white/20;
+    @apply before:text-xs;
+  }
+
+  .slider {
+    @apply h-full bg-white/50 rounded-md overflow-hidden border-2 border-black/50  relative;
+  }
+
+  .slider::before {
+    @apply content-[''] absolute h-full top-0 left-0 bg-black/75;
+    width: var(--start-time-position);
+  }
+
+  .slider::after {
+    @apply content-[''] absolute h-full top-0 right-0 bg-black/75;
+    width: var(--end-time-position);
+  }
+
+  .navbar-responsive__menu {
+    @apply flex flex-col gap-4 text-white text-xl px-4 h-full text-center;
+  }
+
+  .navbar-responsive__menu .menu-item {
+    @apply hover:bg-black/50 p-4 flex items-center justify-center rounded-none;
+  }
+
+  .navbar-responsive__menu .menu-item.primary {
+    @apply hover:bg-primary;
+  }
+
+  .article--item {
+    @apply border-2  h-72 bg-slate-100 p-4 flex items-end justify-end cursor-pointer hover:shadow-md hover:bg-white hover:scale-95 transition duration-300 ease-in-out;
+  }
+
+  .article--item .title {
+    @apply font-bold text-xl md:text-2xl;
+  }
+}
+
+.square {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  transform: translateY(25%);
+}
+
+.moving-svg {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  animation: move-square 3s linear infinite;
+}
+
+@keyframes move-square {
+  0% {
+    top: 0;
+    left: 0;
+  }
+  25% {
+    top: 0;
+    left: 5px;
+  }
+  50% {
+    top: 5px;
+    left: 5px;
+  }
+  75% {
+    top: 5px;
+    left: 0;
+  }
+  100% {
+    top: 0;
+    left: 0;
   }
 }
