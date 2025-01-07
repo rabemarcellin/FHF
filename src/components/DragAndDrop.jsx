@@ -4,7 +4,7 @@ import {
   createPartContainerService,
   endVideoPartService,
   uploadVideoService,
-} from "../services/upload";
+} from "../services/toMessenger";
 import {
   getVideoDurationInSeconds,
   sliceOneVideo,

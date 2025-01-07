@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import crossOriginIsolation from "vite-plugin-cross-origin-isolation";
+import { ngrok } from "vite-plugin-ngrok";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,6 +9,8 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    ngrok("2b7G0h5Q6nBgEw45cfNqlt0lc43_3aVaMMU3wv3SkKPmDCXNq"),
+
     /* crossOriginIsolation(), */
     {
       name: "configure-response-headers",

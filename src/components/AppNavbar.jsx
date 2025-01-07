@@ -12,7 +12,6 @@ export default function AppNavbar() {
     if (isUserLogged) {
       const getUser = async () => {
         const user = await getUserLogged();
-        console.log(user);
         if (user === "KO") {
           console.log("logout");
         } else {
@@ -30,9 +29,6 @@ export default function AppNavbar() {
     return false;
   }, [user]);
 
-  useEffect(() => {
-    console.log("user", user);
-  }, [user]);
   return (
     <div className="z-20 navbar bg-white border-b sticky top-0 min-h-0 h-[50px] lg:h-[60px]">
       <div className="navbar-start">
@@ -268,7 +264,7 @@ export default function AppNavbar() {
                     <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] min-w-52 p-2 shadow -translate-x-10">
                       <li>
                         <Link to="/setting" className="text-end">
-                          Paramètre
+                          Paramètres
                         </Link>
                       </li>
                       <li>
