@@ -13,11 +13,8 @@ const users = getDatabase().collection("users");
 
 authRouter.get("/user", bearerTokenMiddleware, async (req, res) => {
   console.log("/auth/user", new Date().toLocaleString("fr-Fr"));
-  const { userName, role } = req.user;
-  res.json({
-    userName,
-    role,
-  });
+  const user = await users.findOne({ userName: req.user.userName });
+  res.json({ id: user._id, userName: user.userName, role: user.role });
 });
 
 authRouter.post("/login", async (req, res) => {

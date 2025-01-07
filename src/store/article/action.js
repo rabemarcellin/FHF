@@ -15,7 +15,8 @@ export const createNewArticleAction = createAsyncThunk(
         article.title,
         article.desc,
         article.pictures,
-        article.eventDate
+        article.eventDate,
+        article.userId
       );
       return ThunkApi.fulfillWithValue(newArticle);
     } catch (error) {

@@ -11,7 +11,7 @@ const getOneArticle = async (id) => {
   return await articleCollection.findOne({ id: id });
 };
 
-const createArticle = async (title, desc, pictures, eventDate) => {
+const createArticle = async (title, desc, pictures, eventDate, userId) => {
   try {
     const newArticle = {
       id: Date.now().toString(36) + Math.random().toString(36).substr(2),
@@ -19,6 +19,7 @@ const createArticle = async (title, desc, pictures, eventDate) => {
       desc,
       pictures,
       eventDate,
+      userId,
     };
     await articleCollection.insertOne(newArticle);
     return newArticle;

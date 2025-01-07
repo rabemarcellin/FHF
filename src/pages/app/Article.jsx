@@ -12,6 +12,7 @@ import { Link } from "react-router-dom/dist";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { getUserLogged } from "../../services/auth";
 
 const Article = () => {
   const pictureFormRef = useRef();
@@ -36,10 +37,16 @@ const Article = () => {
     setIsProcessing(true);
     event.preventDefault();
 
-    console.log(eventDate);
     if (name && desc && pictures && eventDate) {
+      const userLogged = await getUserLogged();
       await dispatch(
-        createNewArticleAction({ title: name, desc, pictures, eventDate })
+        createNewArticleAction({
+          title: name,
+          desc,
+          pictures,
+          eventDate,
+          userId: userLogged.id,
+        })
       );
     }
     setIsProcessing(false);

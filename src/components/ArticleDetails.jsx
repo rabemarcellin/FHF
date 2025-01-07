@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getOneArticleService } from "../services/article";
 import { Link, useLoaderData } from "react-router-dom/dist";
 import AppNavbar from "./AppNavbar";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import ArticlePicture from "./ArticlePicture";
+import { getUserLogged } from "../services/auth";
 
 export async function loader({ params }) {
   const articleId = params.id;
@@ -12,9 +13,15 @@ export async function loader({ params }) {
 }
 const ArticleDetails = () => {
   const article = useLoaderData();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     document.title = article.title;
+    (async () => {
+      const userLogged = await getUserLogged();
+      console.log(userLogged, article.userId);
+      setUser(userLogged);
+    })();
   }, []);
 
   const eventDate = useMemo(() => {
@@ -32,26 +39,34 @@ const ArticleDetails = () => {
     <div>
       <AppNavbar />
       <div className="p-4 max-w-3xl mx-auto">
-        <Link
-          data-tip="Retour vers la liste des articles"
-          to="/article"
-          className="tooltip tooltip-right before:text-xs lg:before:text-sm  bg-slate-100 w-8 lg:w-12 h-8 lg:h-12 rounded-full flex items-center justify-center hover:bg-slate-200 transition duration-300"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-4 lg:size-6"
+        <div className="flex justify-between">
+          <Link
+            data-tip="Retour vers la liste des articles"
+            to="/article"
+            className="tooltip tooltip-right before:text-xs lg:before:text-sm  bg-slate-100 w-8 lg:w-12 h-8 lg:h-12 rounded-full flex items-center justify-center hover:bg-slate-200 transition duration-300"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-            />
-          </svg>
-        </Link>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-4 lg:size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+          </Link>
+
+          {user &&
+            article.userId &&
+            user.role === "admin" &&
+            user.id === article.userId && <div>Modifier</div>}
+        </div>
+
         <div
           className=" font-bold font-title text-5xl lg:text-7xl leading-10
          lg:leading-snug text-center py-6 pb-lg:py-4"

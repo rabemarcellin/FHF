@@ -33,12 +33,15 @@ articleRouter.post(
     const articleTitle = req.body.title;
     const articleDesc = req.body.desc;
     const eventDate = req.body.eventDate;
+    const userId = req.body.userId;
+    console.log(userId);
     const pictures = req.files.map((each) => each.path);
     const newArticle = await createArticle(
       articleTitle,
       articleDesc,
       pictures,
-      eventDate
+      eventDate,
+      userId
     );
     if (newArticle) {
       res.status(201).json(newArticle);

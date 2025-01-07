@@ -82,7 +82,7 @@ const ArticlePicture = ({ title, src }) => {
 
       {showMorePicture && (
         <div className="z-30 fixed top-0 left-0 w-screen h-screen bg-black/50 flex justify-center items-center">
-          <div className="absolute top-0 right-0 p-2">
+          <div className="absolute top-0 right-0 p-2 z-20">
             <button
               onClick={() => setShowMorePicture(false)}
               data-tip="Fermer"

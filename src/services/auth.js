@@ -1,4 +1,5 @@
 import { API_URL } from "../helpers/constants";
+import api from "./api";
 
 export const loginService = async (userName, password) => {
   try {
@@ -26,24 +27,12 @@ export const loginService = async (userName, password) => {
 
 export const getUserLogged = async () => {
   try {
-    const userToken = localStorage.getItem("token");
+    const response = await api.get("/auth/user");
 
-    if (!userToken) {
-      throw Error("TokenInvalidError");
-    }
-
-    const request = new Request(`${API_URL}/auth/user`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    });
-
-    const response = await fetch(request);
+    if (response.status === 401) return "KO";
 
     if (response.status === 200) {
-      const { userName, role } = await response.json();
-      return { userName, role };
+      return response.data;
     }
 
     throw new Error("ServerFetchingUserLoggedError");
