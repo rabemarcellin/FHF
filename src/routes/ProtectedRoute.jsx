@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { checkUserLogStatus } from "../helpers/utils";
 import { getUserLogged } from "../services/auth";
 import { Outlet, useNavigate } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "../store";
 
 const ProtectedRoute = () => {
   const navigate = useNavigate();
@@ -14,8 +16,6 @@ const ProtectedRoute = () => {
       if (usersId === "KO") {
         console.log("logout");
         navigate("/logout");
-      } else {
-        console.log("usersId", usersId);
       }
     }; // if app store tokens, verify thewe token by fetching the user info
 
@@ -34,7 +34,9 @@ const ProtectedRoute = () => {
       <span className="loading loading-spinner loading-xs"></span>
     </div>
   ) : (
-    <Outlet />
+    <Provider store={store}>
+      <Outlet />
+    </Provider>
   );
 };
 

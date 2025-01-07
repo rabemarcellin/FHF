@@ -2,7 +2,7 @@ import { API_URL } from "../helpers/constants";
 
 export const createPartContainerService = async (videoSize) => {
   try {
-    const request = new Request(`${API_URL}/upload/part`, {
+    const request = new Request(`${API_URL}/messenger/part/new`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -20,7 +20,7 @@ export const createPartContainerService = async (videoSize) => {
 
 export const endVideoPartService = async (partToken, videoSize) => {
   try {
-    const request = new Request(`${API_URL}/upload/part/finish`, {
+    const request = new Request(`${API_URL}/messenger/part/end`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -34,37 +34,13 @@ export const endVideoPartService = async (partToken, videoSize) => {
   }
 };
 
-export const uploadStreamVideo = async (
-  partToken,
-  fileName,
-  videoChunk,
-  position
-) => {
-  const endpoint = `${API_URL}/upload/stream`;
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/octet-stream",
-      "File-Name": fileName,
-      "Part-Token": partToken,
-      Position: position,
-    },
-    body: videoChunk,
-    duplex: "half",
-  });
-
-  const reader = response.body.getReader();
-
-  return reader;
-};
-
 export const uploadVideoService = async (
   videoChunk,
   partToken,
   fileName,
   position
 ) => {
-  const endpoint = `${API_URL}/upload/video`;
+  const endpoint = `${API_URL}/messenger/upload`;
   const formData = new FormData();
   formData.append("video", videoChunk);
   formData.append("fileName", fileName);

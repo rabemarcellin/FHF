@@ -12,6 +12,7 @@ const {
 const users = getDatabase().collection("users");
 
 authRouter.get("/user", bearerTokenMiddleware, async (req, res) => {
+  console.log("/auth/user", new Date().toLocaleString("fr-Fr"));
   const { userName, role } = req.user;
   res.json({
     userName,
@@ -20,6 +21,7 @@ authRouter.get("/user", bearerTokenMiddleware, async (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
+  console.log("/auth/login", new Date().toLocaleString("fr-Fr"));
   const { userName, password } = req.body;
 
   const userExists = await users.findOne({ userName: userName });
@@ -63,6 +65,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/refresh-token", refreshTokenMiddleware, async (req, res) => {
+  console.log("/auth/refresh-token", new Date().toLocaleString("fr-Fr"));
   const newAuthToken = jwt.sign(
     {
       new: true,
@@ -77,6 +80,7 @@ authRouter.post("/refresh-token", refreshTokenMiddleware, async (req, res) => {
 });
 
 authRouter.post("/sign-up", async (req, res) => {
+  console.log("/auth/sign-up", new Date().toLocaleString("fr-Fr"));
   const { userName, password } = req.body;
   const role = "user";
   const userExists = await users.findOne({ userName: userName });
@@ -101,6 +105,7 @@ authRouter.post("/sign-up", async (req, res) => {
 });
 
 authRouter.post("/sign-up/admin", async (req, res) => {
+  console.log("/auth/sign-up/admin", new Date().toLocaleString("fr-Fr"));
   const { userName, password } = req.body;
   const role = "admin";
 

@@ -5,61 +5,6 @@ import UploadProgress from "./UploadProgress";
 const ActiveUploads = ({ activeUploads, setActiveUploads }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const connectToServer = () => {
-    try {
-      const eventSource = new EventSource(`${API_URL}/upload/events`);
-
-      if (!eventSource) {
-        return;
-      }
-      eventSource.onopen = () => {
-        console.log("Connected to server");
-        setTimeout(() => {
-          setIsOpen(true);
-        }, 300);
-      };
-
-      eventSource.onerror = (error) => {
-        console.error("Error connecting to server:", error);
-        setIsOpen(true);
-      };
-
-      eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (!isOpen) setIsOpen(true);
-
-        const isDifference = (prevData, newData) => {
-          if (prevData.length !== newData.length) {
-            return true;
-          }
-
-          return (
-            prevData.filter((prevValue) =>
-              newData.find(
-                (newValue) =>
-                  prevValue.partToken === newValue.partToken &&
-                  prevValue.chunkLength !== newValue.chunkLength
-              )
-            ).length > 0
-          );
-        };
-
-        if (data && Array.isArray(data))
-          if (isDifference(activeUploads, data)) {
-            setActiveUploads(data);
-          }
-      };
-    } catch (error) {
-      console.log("error see: ", error);
-    } finally {
-      setIsOpen(true);
-    }
-  };
-
-  useEffect(() => {
-    // connectToServer();
-  }, []);
   return isOpen ? (
     <>
       <h1 className=" font-black">Upload active ({activeUploads.length})</h1>

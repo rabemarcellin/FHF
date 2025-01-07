@@ -12,6 +12,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/app/Dashboard";
 import Logout from "../pages/app/Logout";
 import Article from "../pages/app/Article";
+import ArticleDetails, { loader } from "../components/ArticleDetails";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,6 +24,11 @@ const router = createBrowserRouter(
         <Route path="logout" element={<Logout />} />
         <Route path="upload" element={<Upload />} />
         <Route path="article" element={<Article />} />
+        <Route
+          path="article/:id"
+          element={<ArticleDetails />}
+          loader={loader}
+        />
       </Route>
     </Route>
   )

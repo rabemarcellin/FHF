@@ -222,11 +222,11 @@
   }
 
   .article--item {
-    @apply border-2  w-full max-w-96 mx-auto h-72 lg:h-96 bg-slate-100 p-4 flex items-end justify-end cursor-pointer hover:shadow-md hover:bg-white hover:scale-95 transition duration-300 ease-in-out;
+    @apply border-2  w-full max-w-96 mx-auto rounded-xl overflow-hidden cursor-pointer hover:border-2 hover:border-primary hover:shadow-xl hover:bg-white transition duration-300 ease-in-out;
   }
 
   .article--item .title {
-    @apply font-bold text-xl md:text-2xl;
+    @apply font-bold text-sm md:text-base;
   }
 }
 
@@ -265,4 +265,9 @@
     top: 0;
     left: 0;
   }
+}
+
+/** Override react date picker library */
+.react-datepicker-wrapper {
+  width: 100%;
 }
