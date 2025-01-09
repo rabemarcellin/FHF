@@ -33,4 +33,11 @@ const createArticle = async (title, desc, pictures, eventDate, userId) => {
   // roadmap, add article video
 };
 
+const updateArticle = async (id, title, desc, eventDate) => {
+  try {
+    const data = {};
+    const updatedArticle = articleCollection.findOneAndUpdate({ id: id });
+  } catch (error) {}
+};
+
 module.exports = { getArticles, getOneArticle, createArticle };

@@ -51,4 +51,15 @@ articleRouter.post(
   }
 );
 
+articleRouter.post(
+  "/update/:articleId",
+  bearerTokenMiddleware,
+  async (req, res) => {
+    console.log(
+      `/article/update/${req.params.articleId}`,
+      new Date().toLocaleString("fr-Fr")
+    );
+  }
+);
+
 module.exports = articleRouter;
