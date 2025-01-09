@@ -11,8 +11,9 @@ import Upload from "../pages/app/Upload";
 import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/app/Dashboard";
 import Logout from "../pages/app/Logout";
-import Article from "../pages/app/Article";
 import ArticleDetails, { loader } from "../components/ArticleDetails";
+import Memorium from "../pages/app/Memorium";
+import MemoriumDay from "../components/MemoriumDay";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,9 +24,11 @@ const router = createBrowserRouter(
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="logout" element={<Logout />} />
         <Route path="upload" element={<Upload />} />
-        <Route path="article" element={<Article />} />
+
+        <Route path="memorium" element={<Memorium />} />
+        <Route path="memorium/:date" element={<MemoriumDay />} />
         <Route
-          path="article/:id"
+          path="memorium/:date/:id"
           element={<ArticleDetails />}
           loader={loader}
         />

@@ -85,7 +85,7 @@ export default function AppNavbar() {
                 </button>
               </div>
               <div className="flex-1">
-                <ul className="navbar-responsive__menu">
+                <ul className="navbar-responsive__menu text-sm">
                   {user ? (
                     <>
                       {/*  <li className="mx-4 font-semibold text-gray-500 hover:text-black hover:font-bold cursor-pointer">
@@ -117,11 +117,10 @@ export default function AppNavbar() {
                         </NavLink>
                       </li>
                       <li>
-                        <NavLink to="/article" className="menu-item">
-                          Articles
+                        <NavLink to="/memorium" className="menu-item">
+                          Memorium
                         </NavLink>
                       </li>
-
                       <li>
                         <NavLink to="/upload" className="menu-item">
                           Vidéo vers Messenger
@@ -188,7 +187,7 @@ export default function AppNavbar() {
 
         {/* large screen */}
         <div className="hidden lg:block">
-          <ul className="flex gap-4 items-center mx-4">
+          <ul className="flex gap-4 items-center mx-4 text-sm">
             {user ? (
               <>
                 {/*  <li className="mx-4 font-semibold text-gray-500 hover:text-black hover:font-bold cursor-pointer">
@@ -224,17 +223,17 @@ export default function AppNavbar() {
                 </li>
                 <li>
                   <NavLink
-                    to="/article"
+                    to="/memorium"
                     className="mx-4 font-semibold text-gray-500 hover:text-black hover:font-bold hover:underline cursor-pointer"
                   >
-                    Articles
+                    Memorium
                   </NavLink>
                 </li>
 
                 <li>
                   <NavLink
                     to="/upload"
-                    className="mx-4 font-semibold text-gray-500 hover:text-black hover:font-bold hover:underline cursor-pointer"
+                    className="mx-4 font-semibold text-gray-500 hover:text-black hover:font-bold hover:underline cursor-pointer whitespace-nowrap"
                   >
                     Vidéo vers Messenger
                   </NavLink>

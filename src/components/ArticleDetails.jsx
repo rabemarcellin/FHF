@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getOneArticleService } from "../services/article";
-import { Link, useLoaderData } from "react-router-dom/dist";
+import { Link, useLoaderData, useNavigate } from "react-router-dom/dist";
 import AppNavbar from "./AppNavbar";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import ArticlePicture from "./ArticlePicture";
@@ -11,15 +11,16 @@ export async function loader({ params }) {
   const article = await getOneArticleService(articleId);
   return article;
 }
+
 const ArticleDetails = () => {
   const article = useLoaderData();
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = article.title;
     (async () => {
       const userLogged = await getUserLogged();
-      console.log(userLogged, article.userId);
       setUser(userLogged);
     })();
   }, []);
@@ -40,9 +41,11 @@ const ArticleDetails = () => {
       <AppNavbar />
       <div className="p-4 max-w-3xl mx-auto">
         <div className="flex justify-between">
-          <Link
+          <button
             data-tip="Retour vers la liste des articles"
-            to="/article"
+            onClick={() => {
+              navigate(-1);
+            }}
             className="tooltip tooltip-right before:text-xs lg:before:text-sm  bg-slate-100 w-8 lg:w-12 h-8 lg:h-12 rounded-full flex items-center justify-center hover:bg-slate-200 transition duration-300"
           >
             <svg
@@ -59,7 +62,7 @@ const ArticleDetails = () => {
                 d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
               />
             </svg>
-          </Link>
+          </button>
 
           {user &&
             article.userId &&
@@ -68,8 +71,8 @@ const ArticleDetails = () => {
         </div>
 
         <div
-          className=" font-bold font-title text-5xl lg:text-7xl leading-10
-         lg:leading-snug text-center py-6 pb-lg:py-4"
+          className="font-title text-5xl lg:text-7xl leading-10
+          text-center py-6 pb-lg:py-4"
         >
           {article.title}
         </div>
@@ -95,7 +98,7 @@ const ArticleDetails = () => {
           </div>
         )}
 
-        <div className="py-5 border-b text-base lg:text-lg">
+        <div className="py-5 border-b text-sm lg:text-base">
           <p className="leading-loose">{article.desc}</p>
         </div>
 

@@ -3,6 +3,7 @@ import ImgCrossOrigin from "./ImgCrossOrigin";
 
 const ArticlePicture = ({ title, src }) => {
   const [showMorePicture, setShowMorePicture] = useState(false);
+  const [isEnter, setIsEnter] = useState(false);
 
   function downloadImage() {
     fetch(src)
@@ -26,13 +27,30 @@ const ArticlePicture = ({ title, src }) => {
 
   return (
     <>
-      <div className="border border-gray-300 hover:shadow-md rounded-xl overflow-hidden bg-white relative">
-        <div className="absolute top-0 right-0 z-10">
+      <div
+        className="border border-gray-300 hover:shadow-md rounded-xl overflow-hidden bg-white relative"
+        onMouseEnter={() => {
+          setIsEnter(true);
+        }}
+        onMouseLeave={() => {
+          setIsEnter(false);
+        }}
+        onTouchStart={() => {
+          setIsEnter(true);
+        }}
+        onTouchEnd={() => {
+          setIsEnter(false);
+        }}
+      >
+        <div
+          className={`absolute top-0 right-0 z-10 ${
+            isEnter ? "opacity-100" : "opacity-30"
+          }`}
+        >
           <div className="flex gap-2 items-center p-2">
             <button
               onClick={() => setShowMorePicture(true)}
               data-tip="Voir"
-              to="/article"
               className="tooltip tooltip-left before:text-xs  active:bg-black bg-black/90 w-8  h-8 rounded-full flex items-center justify-center  transition duration-300"
             >
               <svg
@@ -53,7 +71,6 @@ const ArticlePicture = ({ title, src }) => {
             <button
               onClick={downloadImage}
               data-tip="Télécharger"
-              to="/article"
               className="tooltip tooltip-left before:text-xs  active:bg-black bg-black/90 w-8  h-8 rounded-full flex items-center justify-center transition duration-300"
             >
               <svg
@@ -86,7 +103,6 @@ const ArticlePicture = ({ title, src }) => {
             <button
               onClick={() => setShowMorePicture(false)}
               data-tip="Fermer"
-              to="/article"
               className="tooltip tooltip-left before:text-xs active:bg-black bg-black/90 w-8  h-8 rounded-full flex items-center justify-center transition duration-300 -translate-x-3/4"
             >
               <svg
