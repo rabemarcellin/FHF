@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { checkUserLogStatus } from "../helpers/utils";
 import { getUserLogged } from "../services/auth";
 
@@ -7,13 +7,14 @@ export default function AppNavbar() {
   const [user, setUser] = useState(null);
   const [openMobileMenu, setOpenMobileMenu] = React.useState(false);
   const isUserLogged = checkUserLogStatus();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isUserLogged) {
       const getUser = async () => {
         const user = await getUserLogged();
         if (user === "KO") {
-          console.log("logout");
+          navigate("/logout");
         } else {
           setUser(user);
         }

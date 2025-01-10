@@ -42,7 +42,6 @@ const recoveryTokenMiddleware = (req, res, next) => {
 
 const trackStreamProgress = async (req, res, next) => {
   let keepConnectionInterval = setInterval(() => {
-    console.log("here again");
     res.write("null\n");
   }, 3000);
 

@@ -60,7 +60,6 @@ uploadRouter.post(
   async (req, res) => {
     console.log("POST", "/messenger/upload", new Date().toLocaleString());
     try {
-      console.log("req", req.file.size, req.file.path);
       const { path } = req.file;
       const { partToken, position, fileName } = req.body;
 

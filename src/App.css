@@ -90,6 +90,15 @@
   a.menu-item.active {
     @apply text-gray-500;
   }
+
+  textarea {
+    field-sizing: content;
+    @apply duration-300 transition p-2 rounded-md;
+  }
+
+  textarea:focus {
+    @apply bg-slate-100;
+  }
 }
 
 @layer components {

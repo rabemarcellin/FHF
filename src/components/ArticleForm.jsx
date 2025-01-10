@@ -25,14 +25,25 @@ const ArticleForm = ({ eventDate }) => {
     setIsProcessing(true);
     event.preventDefault();
 
-    if (name && desc && pictures && eventDate) {
+    if (name && desc && pictures) {
       const userLogged = await getUserLogged();
+      const now = new Date();
+      const currentHours = now.getHours();
+      const currentMinutes = now.getMinutes();
+      const currentSeconds = now.getSeconds();
+
       await dispatch(
         createNewArticleAction({
           title: name,
           desc,
           pictures,
-          eventDate,
+          eventDate: new Date(
+            eventDate.year,
+            eventDate.month,
+            eventDate.day,
+            currentHours,
+            currentMinutes
+          ),
           userId: userLogged.id,
         })
       );

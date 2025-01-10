@@ -11,6 +11,22 @@ const getOneArticle = async (id) => {
   return await articleCollection.findOne({ id: id });
 };
 
+const getArticlesByDate = async (date) => {
+  // Parse the input date and construct the start and end of the day
+  const startOfDay = new Date(date);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(date);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  // Query for the range
+  const articlesByDate = await articleCollection
+    .find({ eventDate: { $gte: startOfDay, $lte: endOfDay } })
+    .toArray();
+
+  return articlesByDate;
+};
+
 const createArticle = async (title, desc, pictures, eventDate, userId) => {
   try {
     const newArticle = {
@@ -18,7 +34,7 @@ const createArticle = async (title, desc, pictures, eventDate, userId) => {
       title,
       desc,
       pictures,
-      eventDate,
+      eventDate: new Date(new Date(eventDate).toISOString()),
       userId,
     };
     await articleCollection.insertOne(newArticle);
@@ -35,9 +51,27 @@ const createArticle = async (title, desc, pictures, eventDate, userId) => {
 
 const updateArticle = async (id, title, desc, eventDate) => {
   try {
-    const data = {};
-    const updatedArticle = articleCollection.findOneAndUpdate({ id: id });
-  } catch (error) {}
+    const articleUpdated = await articleCollection.findOneAndUpdate(
+      { id: id },
+      {
+        $set: {
+          title,
+          desc,
+          eventDate: new Date(eventDate),
+        },
+      }
+    );
+    return articleUpdated;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
 };
 
-module.exports = { getArticles, getOneArticle, createArticle };
+module.exports = {
+  getArticles,
+  getOneArticle,
+  createArticle,
+  updateArticle,
+  getArticlesByDate,
+};

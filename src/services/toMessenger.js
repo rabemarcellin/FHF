@@ -51,8 +51,6 @@ export const uploadVideoService = async (
     method: "POST",
     body: formData,
   });
-  console.log("response: ", response);
-  //const data = await response.json();
 
   return response;
 };

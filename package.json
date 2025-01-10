@@ -21,6 +21,7 @@
     "react-datepicker": "^7.6.0",
     "react-dom": "^18.3.1",
     "react-full-screen": "^1.1.1",
+    "react-loading-skeleton": "^3.5.0",
     "react-modal-sheet": "^3.3.0",
     "react-redux": "^9.2.0",
     "react-responsive-masonry": "^2.6.0",

@@ -21,7 +21,6 @@ const SelectMonthForm = ({
   const yearRegex = /^\d{4}$/;
 
   const searchMonth = (text) => {
-    console.log(text, "text");
     const keywords = parseKeywordForMonthSearch(text).map((key) =>
       key.toLowerCase()
     );

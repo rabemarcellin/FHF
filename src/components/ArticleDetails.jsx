@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getOneArticleService } from "../services/article";
 import { Link, useLoaderData, useNavigate } from "react-router-dom/dist";
 import AppNavbar from "./AppNavbar";
@@ -7,6 +7,8 @@ import ArticlePicture from "./ArticlePicture";
 import { getUserLogged } from "../services/auth";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useDispatch } from "react-redux";
+import { updateArticleAction } from "../store/article/action";
 
 export async function loader({ params }) {
   const articleId = params.id;
@@ -22,6 +24,9 @@ const ArticleDetails = () => {
   const [titleTemp, setTitleTemp] = useState("");
   const [descTemp, setDescTemp] = useState("");
   const [eventDateTemp, setEventDateTemp] = useState(new Date());
+  const [isChangeProcessing, setIsChangeProcessing] = useState(false);
+  const descFormRef = useRef(0);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     document.title = article.title;
@@ -59,6 +64,44 @@ const ArticleDetails = () => {
     }
   }, [article]);
 
+  const updateArticleEvent = async (event) => {
+    // todo, data validator
+    event.preventDefault();
+    setIsChangeProcessing(true);
+
+    if (
+      article.id &&
+      titleTemp.length > 0 &&
+      descTemp.length > 0 &&
+      !isNaN(eventDateTemp)
+    ) {
+      await dispatch(
+        updateArticleAction({
+          articleId: article.id,
+          title: titleTemp,
+          desc: descTemp,
+          eventDate: eventDateTemp,
+        })
+      );
+    }
+    setIsChangeProcessing(false);
+
+    setTimeout(() => {
+      setWriteMode(false);
+    }, 300);
+
+    if (new Date(eventDate).getTime() !== eventDateTemp.getTime()) {
+      const newDateDay = eventDateTemp.getDate();
+      const newDateMonth = eventDateTemp.getMonth() + 1;
+      const newDayYear = eventDateTemp.getFullYear();
+      navigate(
+        `/memorium/${newDateDay.toString().padStart(2, "0")}-${newDateMonth
+          .toString()
+          .padStart(2, "0")}-${newDayYear}/${article.id}`
+      );
+    }
+  };
+
   return (
     <div>
       <AppNavbar />
@@ -86,6 +129,7 @@ const ArticleDetails = () => {
                 selected={eventDateTemp}
                 onChange={(date) => setEventDateTemp(date)}
                 className="p-2 outline-none focus:border-gray-500 border rounded-md border-b-4 transition duration-300 ease-in-out w-full"
+                dateFormat="dd/MM/yyyy"
               />
             ) : (
               <div className="text-gray-500">{eventDate}</div>
@@ -117,9 +161,15 @@ const ArticleDetails = () => {
           </button>
           {haveChangePermission && (
             <textarea
-              className=" font-black text-5xl lg:text-7xl leading-10 text-center outline-none disabled:bg-transparent"
+              ref={descFormRef}
+              style={{
+                "field-sizing": "content",
+              }}
+              className=" font-black field-sizing-content  w-full h-max text-2xl lg:text-4xl leading-10 text-center outline-none disabled:bg-transparent"
               value={titleTemp}
-              onChange={(event) => setTitleTemp(event.target.value)}
+              onChange={(event) => {
+                setTitleTemp(event.target.value);
+              }}
               disabled={!writeMode}
             ></textarea>
           )}
@@ -129,25 +179,32 @@ const ArticleDetails = () => {
             user.role === "admin" &&
             user.id == article.userId &&
             (writeMode ? (
-              <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-4 hover:stroke-1 cursor-pointer"
-                  onClick={() => setWriteMode(false)}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m4.5 12.75 6 6 9-13.5"
-                  />
-                </svg>
+              <div className="w-8 h-8 flex justify-center items-center flex-none">
+                {isChangeProcessing ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-4 hover:stroke-1 cursor-pointer"
+                      onClick={updateArticleEvent}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m4.5 12.75 6 6 9-13.5"
+                      />
+                    </svg>
+                  </div>
+                )}
               </div>
             ) : (
-              <div>
+              <div className="w-8 h-8 flex justify-center items-center flex-none">
+                {" "}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -173,7 +230,7 @@ const ArticleDetails = () => {
           </div>
         )}
 
-        <div className="py-5 border-b text-sm lg:text-base">
+        <div className="py-5 border-b text-sm">
           <textarea
             value={descTemp}
             onChange={(e) => setDescTemp(e.target.value)}

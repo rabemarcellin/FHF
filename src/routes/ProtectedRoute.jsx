@@ -14,7 +14,6 @@ const ProtectedRoute = () => {
     const checkUserExists = async () => {
       const usersId = await getUserLogged();
       if (usersId === "KO") {
-        console.log("logout");
         navigate("/logout");
       }
     }; // if app store tokens, verify thewe token by fetching the user info

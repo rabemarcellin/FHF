@@ -40,7 +40,6 @@ const MemoriumCalendar = () => {
       if (cpt % 7 === 0 || cpt + 1 === monthDate + firstDayIndex) {
         if (cpt + 1 === monthDate + firstDayIndex) {
           while (datesLine.length < 7) {
-            console.log();
             datesLine.push(null); // Remplir les éléments manquants avec `null`.
           }
         }
@@ -136,7 +135,6 @@ const MemoriumCalendar = () => {
                       day ? "" : "bg-slate-200"
                     }`}
                     onClick={() => {
-                      console.log(day, selectedMonth + 1, selectedYear);
                       if (day) {
                         navigate(
                           `/memorium/${day.toString().padStart(2, "0")}-${(

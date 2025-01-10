@@ -10,6 +10,11 @@ export const getOneArticleService = async (articleId) => {
   return response.data;
 };
 
+export const getArtilesByDateService = async (dateStringFormat) => {
+  const response = await api.get("/article/date/" + dateStringFormat);
+  return !Array.isArray(response.data) ? [] : response.data;
+};
+
 export const newArticleService = async (
   title,
   desc,
@@ -22,14 +27,26 @@ export const newArticleService = async (
   formData.append("desc", desc);
   formData.append("eventDate", eventDate);
   formData.append("userId", userId);
-  console.log("user id", userId);
   pictures.forEach((picture) => formData.append("picture", picture));
 
   const response = await api.post("/article/create", formData);
 
-  if (response.status === 201) {
-    return response.data;
-  } else {
-    throw new Error("Add Article to server error");
-  }
+  if (response.status === 201) return response.data;
+  return;
+};
+
+export const updateArticleService = async (
+  articleId,
+  title,
+  desc,
+  eventDate
+) => {
+  const response = await api.post("/article/update/" + articleId, {
+    title,
+    desc,
+    eventDate,
+  });
+
+  if (response.status === 200) return response.data;
+  return;
 };
