@@ -7,6 +7,7 @@ const {
   getOneArticle,
   updateArticle,
   getArticlesByDate,
+  checkArticlesByDate,
 } = require("../models/Article");
 
 const articleRouter = express.Router();
@@ -38,6 +39,18 @@ articleRouter.get("/date/:date", bearerTokenMiddleware, async (req, res) => {
   const date = new Date(dateStringFormat);
   const articlesByDate = await getArticlesByDate(date);
   res.json(articlesByDate);
+});
+
+articleRouter.get("/date/:date/check", bearerTokenMiddleware, async (req, res) => {
+  console.log(
+    "GET",
+    `/article/date/${req.params.date}/check`,
+    new Date().toLocaleString("fr-Fr")
+  );
+  const dateStringFormat = req.params.date;
+  const date = new Date(dateStringFormat);
+  const status = await checkArticlesByDate(date);
+  res.json({status});
 });
 
 articleRouter.post(

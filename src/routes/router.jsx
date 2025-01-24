@@ -11,9 +11,9 @@ import Upload from "../pages/app/Upload";
 import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/app/Dashboard";
 import Logout from "../pages/app/Logout";
-import ArticleDetails, { loader } from "../components/ArticleDetails";
+import ArticleDetails, { loader } from "../components/app/memorium/ArticleDetails";
 import Memorium from "../pages/app/Memorium";
-import MemoriumDay from "../components/MemoriumDay";
+import MemoriumDay from "../components/app/memorium/MemoriumDay";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

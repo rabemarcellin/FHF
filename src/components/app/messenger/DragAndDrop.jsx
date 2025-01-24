@@ -4,15 +4,15 @@ import {
   createPartContainerService,
   endVideoPartService,
   uploadVideoService,
-} from "../services/toMessenger";
+} from "../../../services/toMessenger";
 import {
   getVideoDurationInSeconds,
   sliceOneVideo,
   sliceVideo,
-} from "../helpers/utils";
+} from "../../../helpers/utils";
 import RecoveryToken from "./RecoveryToken";
-import { recoveryModalId } from "../helpers/jsx-ids";
-import { AppContext } from "../contexts/AppContextProvider";
+import { recoveryModalId } from "../../../helpers/jsx-ids";
+import { AppContext } from "../../../contexts/AppContextProvider";
 import VideoPreview from "./VideoPreview";
 import ExitFSModal from "./ExitFSModal";
 

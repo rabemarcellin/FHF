@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import ImgCrossOrigin from "./ImgCrossOrigin";
+import ImgCrossOrigin from "../../ui/ImgCrossOrigin";
 
 const ArticleCard = ({ article }) => {
   const [isHover, setIsHover] = useState(false);

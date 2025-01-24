@@ -1,6 +1,6 @@
 import React, { memo } from "react";
-import { recoveryModalId } from "../helpers/jsx-ids";
-import CopyableContent from "./CopyableContent";
+import { recoveryModalId } from "../../../helpers/jsx-ids";
+import CopyableContent from "../../ui/CopyableContent";
 
 const RecoveryToken = ({ token }) => {
   return (

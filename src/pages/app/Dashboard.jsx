@@ -1,5 +1,5 @@
 import React from "react";
-import AppNavbar from "../../components/AppNavbar";
+import AppNavbar from "../../components/ui/AppNavbar";
 
 const Dashboard = () => {
   return (

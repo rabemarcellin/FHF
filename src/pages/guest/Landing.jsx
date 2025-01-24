@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import AppNavbar from "../../components/AppNavbar";
+import AppNavbar from "../../components/ui/AppNavbar";
 import { Link, useNavigate } from "react-router-dom";
 import { checkUserLogStatus } from "../../helpers/utils";
 import { getUserLogged } from "../../services/auth";
@@ -28,7 +28,7 @@ export default function Landing() {
       <div className="max-w-6xl mx-auto">
         <div>
           <div className="py-8 max-w-5xl mx-8">
-            <div className="font-black text-5xl md:text-6xl lg:text-7xl font-seri select-none">
+            <div className="font-bold text-4xl lg:text-6xl select-none">
               Envoyer votre vidéo lourde sur Messenger par ici.
             </div>
             <article className="text-gray-500 font-semibold mt-4 text-xs lg:text-sm">

@@ -1,19 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import AppNavbar from "../../components/AppNavbar";
-import { newArticleService } from "../../services/article";
+import React, { useEffect, useMemo,  useState } from "react";
+import AppNavbar from "../../components/ui/AppNavbar";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAllArticles } from "../../store/article/selector";
 import {
-  createNewArticleAction,
   getArticlesAction,
 } from "../../store/article/action";
-import ImgCrossOrigin from "../../components/ImgCrossOrigin";
-import { Link } from "react-router-dom/dist";
-import DatePicker from "react-datepicker";
-
-import "react-datepicker/dist/react-datepicker.css";
-import { getUserLogged } from "../../services/auth";
-import ArticleCard from "../../components/ArticleCard";
+import ArticleCard from "../../components/app/memorium/ArticleCard";
 
 const Article = () => {
   const articles = useSelector(selectAllArticles);

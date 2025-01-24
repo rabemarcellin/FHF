@@ -27,6 +27,24 @@ const getArticlesByDate = async (date) => {
   return articlesByDate;
 };
 
+const checkArticlesByDate = async (date) => {
+  // Parse the input date and construct the start and end of the day
+  const startOfDay = new Date(date);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(date);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  // Query to check if at least one article exists in the date range
+  const articleExists = await articleCollection.findOne({
+    eventDate: { $gte: startOfDay, $lte: endOfDay },
+  });
+
+  // Return true if an article is found, false otherwise
+  return !!articleExists;
+};
+
+
 const createArticle = async (title, desc, pictures, eventDate, userId) => {
   try {
     const newArticle = {
@@ -74,4 +92,5 @@ module.exports = {
   createArticle,
   updateArticle,
   getArticlesByDate,
+  checkArticlesByDate
 };

@@ -15,6 +15,10 @@ export const getArtilesByDateService = async (dateStringFormat) => {
   return !Array.isArray(response.data) ? [] : response.data;
 };
 
+export const checkArtilesByDateService = async (dateStringFormat) => {
+  const response = await api.get("/article/date/" + dateStringFormat + "/check");
+  return response.data.status
+};
 export const newArticleService = async (
   title,
   desc,

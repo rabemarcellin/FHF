@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Timeline from "./Timeline";
+import Timeline from "../../ui/Timeline";
 
 const VideoPreview = ({ videoPreview, uploadTrimVideo, exitFullScreen }) => {
   const videoPreviewRef = React.useRef(null);

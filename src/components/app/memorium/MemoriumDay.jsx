@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { convertDate } from "../helpers/date-utils";
-import AppNavbar from "./AppNavbar";
-import { daysOfWeek, months } from "../datas/date";
+import { convertDate } from "../../../helpers/date-utils";
+import AppNavbar from "../../ui/AppNavbar";
+import { daysOfWeek, months } from "../../../datas/date";
 import { useDispatch, useSelector } from "react-redux";
-import { getArticlesByDateAction } from "../store/article/action";
-import { selectAllArticles } from "../store/article/selector";
+import { getArticlesByDateAction } from "../../../store/article/action";
+import { selectAllArticles } from "../../../store/article/selector";
 import { Link } from "react-router-dom";
 import ArticleForm from "./ArticleForm";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";

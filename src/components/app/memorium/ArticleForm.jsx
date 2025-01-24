@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { getUserLogged } from "../services/auth";
-import { createNewArticleAction } from "../store/article/action";
+import { getUserLogged } from "../../../services/auth";
+import { createNewArticleAction } from "../../../store/article/action";
 import { useDispatch } from "react-redux";
 
 const ArticleForm = ({ eventDate }) => {

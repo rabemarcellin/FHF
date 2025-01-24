@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserByIdService } from "../services/user";
+import { getUserByIdService } from "../../../services/user";
 
 const ArticlePostCard = ({ date, article }) => {
   const navigate = useNavigate();

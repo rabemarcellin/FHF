@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ImgCrossOrigin from "./ImgCrossOrigin";
+import ImgCrossOrigin from "../../ui/ImgCrossOrigin";
 
 const ArticlePicture = ({ title, src }) => {
   const [showMorePicture, setShowMorePicture] = useState(false);

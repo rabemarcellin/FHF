@@ -3,7 +3,7 @@ import { useAsyncMemo } from "use-async-memo";
 import {
   convertToHHMMSS,
   getVideoDurationInSeconds,
-} from "../../helpers/utils";
+} from "../../../helpers/utils";
 import { getVideoPosition, moveSidebarLeft, moveSidebarRight } from "./utils";
 import reducer from "./reducer";
 import actionsType, {

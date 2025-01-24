@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import { Sheet } from "react-modal-sheet";
 
-import DragAndDrop from "../../components/DragAndDrop";
-import UploadProgress from "../../components/UploadProgress";
-import AppNavbar from "../../components/AppNavbar";
-import ActiveUploads from "../../components/ActiveUploads";
+import DragAndDrop from "../../components/app/messenger/DragAndDrop";
+import AppNavbar from "../../components/ui/AppNavbar";
+import ActiveUploads from "../../components/app/messenger/ActiveUploads";
 import { sleep } from "../../helpers/utils";
 
 let lastScrollTop = 0;

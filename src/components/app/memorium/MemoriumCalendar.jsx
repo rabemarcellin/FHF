@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import AppNavbar from "./AppNavbar";
+import {useAsyncMemo} from "use-async-memo"
+import AppNavbar from "../../ui/AppNavbar";
 import SelectMonthForm from "./SelectMonthForm";
 import { useNavigate } from "react-router-dom";
-import { daysOfWeek } from "../datas/date";
+import { daysOfWeek } from "../../../datas/date";
+import { checkArtilesByDateService } from "../../../services/article";
+import Skeleton from 'react-loading-skeleton'
 
 // todo: migrate in utils
 const getNaturalMonth = (date) => date.getMonth();
@@ -10,6 +13,7 @@ const getNaturalMonth = (date) => date.getMonth();
 const MemoriumCalendar = () => {
   const navigate = useNavigate();
   const today = new Date();
+  const [loading, setLoading] = useState(false)
   const [selectedMonth, setSelectedMonth] = useState(getNaturalMonth(today));
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   // todo: translator date to text form as "Dec 2022" and the reverse
@@ -19,7 +23,7 @@ const MemoriumCalendar = () => {
     [selectedMonth, selectedYear]
   );
 
-  const monthsDate = useMemo(() => {
+  const monthsDate = useAsyncMemo(async () => {
     const monthDate = new Date(selectedYear, selectedMonth + 1, 0).getDate();
 
     const dates = [];
@@ -30,17 +34,41 @@ const MemoriumCalendar = () => {
       ) + 1;
 
     for (let i = 0; i < firstDayIndex - 1; i++) {
-      datesLine.push(null);
+      datesLine.push({
+        id: null,
+        haveArticle: false
+      });
     }
 
     for (let cpt = firstDayIndex; cpt < monthDate + firstDayIndex; cpt++) {
-      datesLine.push(
-        cpt > monthDate + firstDayIndex ? null : cpt - firstDayIndex + 1
-      );
+      const isDateValid =  cpt > monthDate + firstDayIndex === false
+
+      if(isDateValid) {
+        const format =  selectedYear +
+          "-" +
+          (selectedMonth + 1).toString().padStart(2, "0") +
+          "-" +
+          (cpt - firstDayIndex + 1).toString().padStart(2, "0")
+          console.log("format", format)
+        const haveArticle = await checkArtilesByDateService(format)
+        datesLine.push(
+          cpt > monthDate + firstDayIndex ? null : {id: cpt - firstDayIndex + 1, haveArticle: haveArticle}
+        );
+      } else {
+        datesLine.push({
+          id: null,
+          haveArticle: false
+        })
+      }
+      
+
       if (cpt % 7 === 0 || cpt + 1 === monthDate + firstDayIndex) {
         if (cpt + 1 === monthDate + firstDayIndex) {
           while (datesLine.length < 7) {
-            datesLine.push(null); // Remplir les éléments manquants avec `null`.
+            datesLine.push({
+              id: null,
+              haveArticle: false
+            }); // Remplir les éléments manquants avec `null`.
           }
         }
         dates.push(datesLine);
@@ -48,10 +76,14 @@ const MemoriumCalendar = () => {
       }
     }
 
+    console.log("dates: ", dates)
+    setLoading(false)
     return dates;
-  }, [firstMonthDay]);
+  }, [firstMonthDay, selectedMonth, selectedYear]);
 
-  useEffect(() => {}, [selectedMonth, selectedYear]);
+  useEffect(() => {
+    setLoading(true)
+  }, [selectedMonth, selectedYear]);
 
   return (
     <div>
@@ -127,17 +159,17 @@ const MemoriumCalendar = () => {
             </tr>
           </thead>
           <tbody>
-            {monthsDate.map((week) => (
+            {monthsDate && !loading ? monthsDate.map((week) => (
               <tr>
                 {week.map((day) => (
                   <td
-                    className={`p-2 text-center hover:bg-slate-100 cursor-pointer select-none ${
-                      day ? "" : "bg-slate-200"
+                    className={`p-1 text-center hover:bg-slate-100 cursor-pointer select-none ${
+                      day.id ? "" : "bg-slate-200"
                     }`}
                     onClick={() => {
-                      if (day) {
+                      if (day.id) {
                         navigate(
-                          `/memorium/${day.toString().padStart(2, "0")}-${(
+                          `/memorium/${day.id.toString().padStart(2, "0")}-${(
                             selectedMonth + 1
                           )
                             .toString()
@@ -146,7 +178,18 @@ const MemoriumCalendar = () => {
                       }
                     }}
                   >
-                    {day}
+                    <div className={`${day.haveArticle ? "border border-primary hover:bg-blue-100": ""} rounded-md p-2 hover:bg-blue-50`}>
+                    {day.id}
+
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            )): [0, 1, 2, 4].map(line => (
+              <tr className="">
+                {[0, 1, 2, 3, 4, 5, 6].map(day => (
+                  <td>
+                    <Skeleton height={50} />
                   </td>
                 ))}
               </tr>

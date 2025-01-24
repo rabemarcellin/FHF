@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { API_URL } from "../helpers/constants";
+import { API_URL } from "../../../helpers/constants";
 import UploadProgress from "./UploadProgress";
 
 const ActiveUploads = ({ activeUploads, setActiveUploads }) => {

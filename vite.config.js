@@ -9,7 +9,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    ngrok("2b7G0h5Q6nBgEw45cfNqlt0lc43_3aVaMMU3wv3SkKPmDCXNq"),
 
     /* crossOriginIsolation(), */
     {

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { checkUserLogStatus } from "../helpers/utils";
-import { getUserLogged } from "../services/auth";
+import { checkUserLogStatus } from "../../helpers/utils";
+import { getUserLogged } from "../../services/auth";
 
 export default function AppNavbar() {
   const [user, setUser] = useState(null);

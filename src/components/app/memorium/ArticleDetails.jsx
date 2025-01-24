@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { getOneArticleService } from "../services/article";
+import { getOneArticleService } from "../../../services/article";
 import { Link, useLoaderData, useNavigate } from "react-router-dom/dist";
-import AppNavbar from "./AppNavbar";
+import AppNavbar from "../../ui/AppNavbar";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import ArticlePicture from "./ArticlePicture";
-import { getUserLogged } from "../services/auth";
+import { getUserLogged } from "../../../services/auth";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch } from "react-redux";
-import { updateArticleAction } from "../store/article/action";
+import { updateArticleAction } from "../../../store/article/action";
 
 export async function loader({ params }) {
   const articleId = params.id;
