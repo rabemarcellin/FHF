@@ -178,7 +178,7 @@ const MemoriumCalendar = () => {
                       }
                     }}
                   >
-                    <div className={`${day.haveArticle ? "border border-primary hover:bg-blue-100": ""} rounded-md p-2 hover:bg-blue-50`}>
+                    <div className={`${day.haveArticle ? "border-b border-primary hover:bg-blue-100": ""} p-2 hover:bg-blue-50`}>
                     {day.id}
 
                     </div>

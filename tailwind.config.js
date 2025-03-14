@@ -6,8 +6,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        text: ["Montserrat", "Signika", "Poppins",  "'Open Sans'", "sans-serif"],
-        title: ["Gochi Hand"],
+        title: ["DejaVu-Sans", "sans-serif"],
       },
     },
   },

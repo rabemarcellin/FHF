@@ -28,7 +28,7 @@ export default function Landing() {
       <div className="max-w-6xl mx-auto">
         <div>
           <div className="py-8 max-w-5xl mx-8">
-            <div className="font-bold text-4xl lg:text-6xl select-none">
+            <div className="font-black text-4xl lg:text-6xl select-none">
               Envoyer votre vidéo lourde sur Messenger par ici.
             </div>
             <article className="text-gray-500 font-semibold mt-4 text-xs lg:text-sm">
